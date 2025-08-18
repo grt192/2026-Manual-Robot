@@ -1,21 +1,14 @@
 package frc.robot.subsystems.swerve;
 
-import java.util.EnumSet;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import static frc.robot.Constants.SwerveConstants.DRIVE_D;
-import static frc.robot.Constants.SwerveConstants.DRIVE_I;
-import static frc.robot.Constants.SwerveConstants.DRIVE_P;
-import static frc.robot.Constants.SwerveConstants.DRIVE_S;
-import static frc.robot.Constants.SwerveConstants.DRIVE_V;
-import static frc.robot.Constants.SwerveConstants.STEER_D;
-import static frc.robot.Constants.SwerveConstants.STEER_FF;
-import static frc.robot.Constants.SwerveConstants.STEER_I;
-import static frc.robot.Constants.SwerveConstants.STEER_P;
+
+import static frc.robot.Constants.SwerveConstants.*;
+
+import java.util.EnumSet;
 
 public class KrakenSwerveModule {
 
@@ -73,16 +66,8 @@ public class KrakenSwerveModule {
         Rotation2d currentAngle = getWrappedAngle();
         state.optimize(currentAngle);
 
-        // Subtract offset from target angle since the motor position already includes the offset
         double targetAngleRads = state.angle.getRadians() - offsetRads;
         double angleErrorRads = state.angle.minus(currentAngle).getRadians();
-
-        // Debug output for troubleshooting
-        if (Math.abs(angleErrorRads) > 0.1) { // Only print when there's significant error
-            System.out.println("Module " + steerPort + ": Target=" + Math.toDegrees(targetAngleRads) + 
-                             "°, Current=" + Math.toDegrees(currentAngle.getRadians()) + 
-                             "°, Error=" + Math.toDegrees(angleErrorRads) + "°");
-        }
 
         // Multiply by cos so we don't move quickly when the swerves are angled wrong
         double targetVelocity = state.speedMetersPerSecond * Math.cos(angleErrorRads);
@@ -97,9 +82,7 @@ public class KrakenSwerveModule {
      */
     public void setOptomizedDesiredState(SwerveModuleState state) {
         driveMotor.setVelocity(state.speedMetersPerSecond);
-        // Subtract offset from target angle for consistency
-        double targetAngleRads = state.angle.getRadians() - offsetRads;
-        steerMotor.setPosition(targetAngleRads); 
+        steerMotor.setPosition(state.angle.getRadians()); 
     }
 
     /** Gets the current state of the swerve module.
@@ -129,19 +112,10 @@ public class KrakenSwerveModule {
      * @return Wrapped angle in radians from -pi to pi
      */
     public Rotation2d getWrappedAngle() {
-        // Get the motor position (0-1 range)
-        double normalizedPosition = steerMotor.getPosition();
-        
-        // Convert normalized position (0-1) to radians (-π to π)
-        // 0 = -π, 0.5 = 0, 1 = π
-        double angleRads = (2.0 * Math.PI * normalizedPosition) - Math.PI;
-        
-        // Apply the offset correction
-        angleRads = angleRads - offsetRads;
-        
-        // Wrap the angle to -π to π range
-        while (angleRads > Math.PI) angleRads -= 2.0 * Math.PI;
-        while (angleRads < -Math.PI) angleRads += 2.0 * Math.PI;
+        // returned a 0-1 value
+        double angleDouble = steerMotor.getPosition();
+        double angleRads = (2. * Math.PI * angleDouble) - Math.PI;
+        // double wrappedAngleRads = MathUtil.angleModulus(angleRads + offsetRads);
 
         return new Rotation2d(angleRads);
     }

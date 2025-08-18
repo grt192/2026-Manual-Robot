@@ -112,8 +112,7 @@ public class SteerMotor {
         // Encoder Being Applied
         motorConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID(); 
         motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        // Remove RotorToSensorRatio - let the motor use raw encoder values
-        // motorConfig.Feedback.RotorToSensorRatio = STEER_GEAR_REDUCTION; // ensures sensor scaling matches gear reduction 
+        motorConfig.Feedback.RotorToSensorRatio = STEER_GEAR_REDUCTION; // ensures sensor scaling matches gear reduction 
 
         // Enable position wrapping (by default values are from 0-1)
         closedLoopGeneralConfigs.ContinuousWrap = true; //basicaly turns stacking off
@@ -265,21 +264,11 @@ public class SteerMotor {
      * @param targetRads target position in radiants
      */
     public void setPosition(double targetRads) {
-        // Convert radians to normalized position (0-1)
-        // The motor expects values from 0-1, where 0 = -180°, 0.5 = 0°, 1 = 180°
-        double normalizedPosition = (targetRads + Math.PI) / (2.0 * Math.PI);
+        // Convert to motor rotations and apply gear reduction
+        double motorRotations = (targetRads / (2.0 * Math.PI)) * STEER_GEAR_REDUCTION;
         
-        // Ensure the position is wrapped to 0-1 range
-        normalizedPosition = normalizedPosition % 1.0;
-        if (normalizedPosition < 0) normalizedPosition += 1.0;
-        
-        // Safety check - prevent extreme values
-        if (Double.isNaN(normalizedPosition) || Double.isInfinite(normalizedPosition)) {
-            return;
-        }
-        
-        // Set the motor position directly in normalized units
-        motor.setControl(positionRequest.withPosition(normalizedPosition));
+        // The motor's continuous wrap will handle finding the shortest path
+        motor.setControl(positionRequest.withPosition(motorRotations));
     }
 }
 

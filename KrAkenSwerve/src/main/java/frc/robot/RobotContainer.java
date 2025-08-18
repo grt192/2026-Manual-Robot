@@ -5,14 +5,18 @@
 package frc.robot;
 
 // frc imports
+import frc.robot.controllers.PS5DriveController;
+
+// Subsystems
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+
+// WPILib imports
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.controllers.PS5DriveController;
-import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 
 

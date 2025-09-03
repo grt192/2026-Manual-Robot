@@ -1,7 +1,9 @@
 package frc.robot.subsystems.swerve;
 
 //Constants Import 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -16,6 +18,9 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import static frc.robot.Constants.SwerveSteerConstants.STEER_GEAR_REDUCTION;
@@ -49,6 +54,11 @@ public class SteerMotor {
     // For Logging
     private DoubleLogEntry temperatureLogEntry;
     private DoubleLogEntry motorPositionLogEntry;
+    private DoubleLogEntry targetPositionLogEntry;
+    private DoubleLogEntry appliedVoltsLogEntry;
+    private DoubleLogEntry supplyCurrLogEntry;
+    private DoubleLogEntry torqueCurrLogEntry;
+    private DoubleLogEntry positionErrorLogEntry;
 
     // For NT
     private NetworkTableInstance ntInstance;
@@ -56,7 +66,16 @@ public class SteerMotor {
     private DoublePublisher motorPositionPublisher;
     private DoublePublisher targetPositionPublisher;
     private DoublePublisher motorTemperaturePublisher;
+    private DoublePublisher appliedVoltsPublisher;
+    private DoublePublisher supplyCurrentPublisher;
+    private DoublePublisher torqueCurrentPublisher;
+    private DoublePublisher positionErrorPublisher;
 
+    // Phoenix 6 Status Signals
+    private StatusSignal<Angle> positionSignal;
+    private StatusSignal<Voltage> appliedVoltsSignal;
+    private StatusSignal<Current> supplyCurrentSignal;
+    private StatusSignal<Current> torqueCurrentSignal;
 
 
     public SteerMotor(int motorCAN, int encoderCAN) {
@@ -73,6 +92,9 @@ public class SteerMotor {
 
         // Initialize logs
         initLogs(motorCAN);
+        
+        // Initialize Phoenix 6 signals
+        initSignals();
 
     }
 
@@ -130,14 +152,40 @@ public class SteerMotor {
         motor.setPosition(0);
     }
 
+    /**
+     * Initializes Phoenix 6's signals
+     */
+    private void initSignals(){
+        positionSignal = motor.getPosition();
+        appliedVoltsSignal = motor.getMotorVoltage();
+        torqueCurrentSignal = motor.getTorqueCurrent();
+        supplyCurrentSignal = motor.getSupplyCurrent();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            250.0, positionSignal, appliedVoltsSignal,
+            torqueCurrentSignal, supplyCurrentSignal
+        );
+        motor.optimizeBusUtilization(0, 1.0);
+    }
+
     private void initLogs(int canId) {
         temperatureLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "motorTemperature");
         motorPositionLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "motorPosition");
+        targetPositionLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "targetPosition");
+        appliedVoltsLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "appliedVolts");
+        supplyCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "supplyCurrent");
+        torqueCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "torqueCurrent");
+        positionErrorLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "positionError");
     }
 
     public void logStats() {
         temperatureLogEntry.append(getTemperature(), GRTUtil.getFPGATime());
         motorPositionLogEntry.append(getPosition(), GRTUtil.getFPGATime());
+        targetPositionLogEntry.append(getPosition(), GRTUtil.getFPGATime()); // TODO: Log actual target
+        appliedVoltsLogEntry.append(appliedVoltsSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        supplyCurrLogEntry.append(supplyCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        torqueCurrLogEntry.append(torqueCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        positionErrorLogEntry.append(0.0, GRTUtil.getFPGATime()); // TODO: Calculate actual position error
     }
 
     private void initNT(int canId) {
@@ -147,12 +195,20 @@ public class SteerMotor {
         motorPositionPublisher = steerStatsTable.getDoubleTopic(canId + "motorPosition").publish();
         targetPositionPublisher = steerStatsTable.getDoubleTopic(canId + "targetPosition").publish();
         motorTemperaturePublisher = steerStatsTable.getDoubleTopic(canId + "motorTemperature").publish();
+        appliedVoltsPublisher = steerStatsTable.getDoubleTopic(canId + "appliedVolts").publish();
+        supplyCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "supplyCurrent").publish();
+        torqueCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "torqueCurrent").publish();
+        positionErrorPublisher = steerStatsTable.getDoubleTopic(canId + "positionError").publish();
     }
 
     public void publishStats() {
         motorPositionPublisher.set(getPosition());
-        targetPositionPublisher.set(degreesToMotorRotations(getPosition())); // Or use some relevant target position
+        targetPositionPublisher.set(getPosition()); // Just show current position for now
         motorTemperaturePublisher.set(getTemperature());
+        appliedVoltsPublisher.set(appliedVoltsSignal.getValueAsDouble());
+        supplyCurrentPublisher.set(supplyCurrentSignal.getValueAsDouble());
+        torqueCurrentPublisher.set(torqueCurrentSignal.getValueAsDouble());
+        positionErrorPublisher.set(0.0); // TODO: Calculate actual position error
     }
     
 
@@ -164,7 +220,7 @@ public class SteerMotor {
      * @return position in double from 0 to 1
      */
     public double getPosition() {
-        return motor.getPosition().getValueAsDouble();
+        return cancoder.getAbsolutePosition().getValueAsDouble(); // 0..1 absolute
     }
 
     /**

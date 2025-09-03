@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import java.util.EnumSet;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -120,9 +121,10 @@ public class KrakenSwerveModule {
      */
     public Rotation2d getWrappedAngle() {
         // returned a 0-1 value
-        double angleDouble = steerMotor.getPosition();
-        double angleRads = (2. * Math.PI * angleDouble) - Math.PI;
+        double angleDouble = steerMotor.getPosition();              // 0..1
+        double angleRads = (2.0 * Math.PI * angleDouble) - Math.PI; // [-π, π)
         // double wrappedAngleRads = MathUtil.angleModulus(angleRads + offsetRads);
+        angleRads = MathUtil.angleModulus(angleRads + offsetRads);
 
         return new Rotation2d(angleRads);
     }
@@ -185,5 +187,33 @@ public class KrakenSwerveModule {
                 driveMotor.configPID(pidsv[0], pidsv[1], pidsv[2], pidsv[3], pidsv[4]);
             }
         );
+    }
+
+    /**
+     * Publishes drive motor statistics to NetworkTables
+     */
+    public void publishDriveStats() {
+        driveMotor.publishStats();
+    }
+
+    /**
+     * Publishes steer motor statistics to NetworkTables
+     */
+    public void publishSteerStats() {
+        steerMotor.publishStats();
+    }
+
+    /**
+     * Logs drive motor statistics to data log
+     */
+    public void logDriveStats() {
+        driveMotor.logStats();
+    }
+
+    /**
+     * Logs steer motor statistics to data log
+     */
+    public void logSteerStats() {
+        steerMotor.logStats();
     }
 }

@@ -1,23 +1,15 @@
 package frc.robot.subsystems.swerve;
 
 //Constants Import 
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_RAMP_RATE;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-//CTRE imports
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-
-//Logging imports
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,8 +19,12 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import frc.robot.util.GRTUtil;
 import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_RAMP_RATE;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
+import frc.robot.util.GRTUtil;
 
 
 
@@ -276,6 +272,33 @@ public class DriveMotor {
      */
     public double getTemperature() {
         return motor.getDeviceTemp().getValueAsDouble();
+    }
+
+    /**
+     * Publishes drive motor statistics to NetworkTables
+     */
+    public void publishStats() {
+        positionPublisher.set(getDistance());
+        targetRPSPublisher.set(targetRotationsPerSec);
+        veloErrorPublisher.set(0.0); // TODO: Calculate actual velocity error
+        veloPublisher.set(getVelocity());
+        appliedVlotsPublisher.set(appliedVoltsSignal.getValueAsDouble());
+        supplyCurrentPublisher.set(supplyCurrentSignal.getValueAsDouble());
+        torqueCurrentPublisher.set(torqueCurrentSignal.getValueAsDouble());
+    }
+
+    /**
+     * Logs drive motor statistics to data log
+     */
+    public void logStats() {
+        positionLogEntry.append(getDistance(), GRTUtil.getFPGATime());
+        targetVeloEntry.append(targetRotationsPerSec, GRTUtil.getFPGATime());
+        veloErrorLogEntry.append(0.0, GRTUtil.getFPGATime()); // TODO: Calculate actual velocity error
+        veloLogEntry.append(getVelocity(), GRTUtil.getFPGATime());
+        appliedVoltsLogEntry.append(appliedVoltsSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        supplyCurrLogEntry.append(supplyCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        torqueCurrLogEntry.append(torqueCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
+        temperatureLogEntry.append(getTemperature(), GRTUtil.getFPGATime());
     }
 
     

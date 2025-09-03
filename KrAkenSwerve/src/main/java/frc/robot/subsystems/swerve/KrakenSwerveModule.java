@@ -74,14 +74,14 @@ public class KrakenSwerveModule {
         Rotation2d currentAngle = getWrappedAngle();
         state.optimize(currentAngle);
 
-        double targetAngleRads = state.angle.getRadians() - offsetRads;
-        double angleErrorRads = state.angle.minus(currentAngle).getRadians();
 
-        // Multiply by cos so we don't move quickly when the swerves are angled wrong
-        double targetVelocity = state.speedMetersPerSecond * Math.cos(angleErrorRads);
+        double targetAngleRads = state.angle.getRadians() - offsetRads;
+        double angleErrorRads  = state.angle.minus(currentAngle).getRadians();
+        double targetVelocity  = state.speedMetersPerSecond * Math.cos(angleErrorRads);
 
         driveMotor.setVelocity(targetVelocity);
         steerMotor.setPosition(targetAngleRads);
+
     }
 
     /** Sets the optimized desired state of this swerve module through setting the PID targets.

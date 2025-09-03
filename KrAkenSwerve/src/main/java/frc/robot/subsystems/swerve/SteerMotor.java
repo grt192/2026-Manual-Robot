@@ -106,8 +106,10 @@ public class SteerMotor {
          * Stuff Needed To DO On Software
          *      Inverse Direction
          *      Turn Range into -180 to 180
+         * ASK DT IF THEY HAVE A OFFSET (LOW PRIORITY)
          */
         // cancoderconfig.MagnetSensor.MagnetOffset = offsetRads / (2.0 * Math.PI);
+        cancoderconfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         cancoder.getConfigurator().apply(cancoderconfig);
 
         // Apply config with retries (max 5 attempts)
@@ -135,9 +137,13 @@ public class SteerMotor {
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Encoder Being Applied
-        motorConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID(); 
-        motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        motorConfig.Feedback.RotorToSensorRatio = 1.0; // Should be 1.0 for CANcoder
+
+        // Use the CANcoder as feedback
+        motorConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
+        motorConfig.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.RemoteCANcoder;
+
+        // Tell it how rotor relates to module angle:
+        motorConfig.Feedback.RotorToSensorRatio = STEER_GEAR_REDUCTION; // e.g., 12.8
 
         // Enable position wrapping (by default values are from 0-1)
         closedLoopGeneralConfigs.ContinuousWrap = true; //basicaly turns stacking off
@@ -222,7 +228,8 @@ public class SteerMotor {
      * @return position in double from 0 to 1
      */
     public double getPosition() {
-        return cancoder.getAbsolutePosition().getValueAsDouble(); // 0..1 absolute
+        return cancoder.getAbsolutePosition().getValueAsDouble(); // 0..1 rotations, absolute
+
     }
 
     /**
@@ -327,14 +334,8 @@ public class SteerMotor {
      */
     public void setPosition(double targetRads) {
 
-        // Convert RADS to Degree
-        double targetDegrees = (targetRads * 360) / (2. * Math.PI);
-
-        // Convert target degrees to motor rotations (divide by gear reduction)
-        double desiredMotorRotations = (targetDegrees / 360.0) / STEER_GEAR_REDUCTION;
-
-        //Creates a reqest to go to that said position
-        positionRequest.withPosition(desiredMotorRotations);
+        double rotorRotations = (targetRads / (2.0 * Math.PI)) * STEER_GEAR_REDUCTION;
+        positionRequest.withPosition(rotorRotations).withSlot(0);
         motor.setControl(positionRequest);
     }
 }

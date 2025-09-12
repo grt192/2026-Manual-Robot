@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -103,12 +104,7 @@ public class SteerMotor {
      * Applying Configurations to CANCODER
      */
     private void configureCancoder() {
-        /**
-         * Stuff Needed To DO On Software
-         *      Inverse Direction
-         *      Turn Range into -180 to 180
-         * ASK DT IF THEY HAVE A OFFSET (LOW PRIORITY)
-         */
+        
         // cancoderconfig.MagnetSensor.MagnetOffset = offsetRads / (2.0 * Math.PI);
         cancoderconfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         cancoder.getConfigurator().apply(cancoderconfig);
@@ -134,10 +130,12 @@ public class SteerMotor {
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = STEER_RAMP_RATE;
 
         // By Default Robot will not move
-        motorConfig.MotorOutput.Inverted = com.ctre.phoenix6.signals.InvertedValue.CounterClockwise_Positive; // required if motor spins opposite 
+        motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // required if motor spins opposite 
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Encoder Being Applied
+
+// GUYS WE DID NOT APPLY IT T_T
 
         // Use the CANcoder as feedback
         motorConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();

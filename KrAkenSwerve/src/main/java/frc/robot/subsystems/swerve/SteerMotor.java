@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -133,10 +134,12 @@ public class SteerMotor {
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = STEER_RAMP_RATE;
 
         // By Default Robot will not move
-        motorConfig.MotorOutput.Inverted = com.ctre.phoenix6.signals.InvertedValue.CounterClockwise_Positive; // required if motor spins opposite 
+        motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // required if motor spins opposite 
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Encoder Being Applied
+
+// GUYS WE DID NOT APPLY IT T_T
 
         // Use the CANcoder as feedback
         motorConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();

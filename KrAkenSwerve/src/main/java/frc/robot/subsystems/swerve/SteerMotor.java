@@ -63,6 +63,7 @@ public class SteerMotor {
     // For NT
     private NetworkTableInstance ntInstance;
     private NetworkTable steerStatsTable;
+    private DoublePublisher encoderPositionPublisher;
     private DoublePublisher motorPositionPublisher;
     private DoublePublisher targetPositionPublisher;
     private DoublePublisher motorTemperaturePublisher;
@@ -199,7 +200,7 @@ public class SteerMotor {
     private void initNT(int canId) {
         ntInstance = NetworkTableInstance.getDefault();
         steerStatsTable = ntInstance.getTable("SwerveSteer");
-    
+        encoderPositionPublisher = steerStatsTable.getDoubleTopic(canId + "encoderPosition").publish();
         motorPositionPublisher = steerStatsTable.getDoubleTopic(canId + "motorPosition").publish();
         targetPositionPublisher = steerStatsTable.getDoubleTopic(canId + "targetPosition").publish();
         motorTemperaturePublisher = steerStatsTable.getDoubleTopic(canId + "motorTemperature").publish();
@@ -211,6 +212,7 @@ public class SteerMotor {
 
     public void publishStats() {
         motorPositionPublisher.set(getPosition());
+        encoderPositionPublisher.set(cancoder.getPosition().getValueAsDouble());
         targetPositionPublisher.set(getPosition()); // Just show current position for now
         motorTemperaturePublisher.set(getTemperature());
         appliedVoltsPublisher.set(appliedVoltsSignal.getValueAsDouble());
@@ -337,6 +339,7 @@ public class SteerMotor {
         double rotorRotations = (targetRads / (2.0 * Math.PI)) * STEER_GEAR_REDUCTION;
         positionRequest.withPosition(rotorRotations).withSlot(0);
         motor.setControl(positionRequest);
+        publishStats();
     }
 }
 

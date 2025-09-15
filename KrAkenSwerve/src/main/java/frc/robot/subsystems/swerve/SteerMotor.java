@@ -228,8 +228,7 @@ public class SteerMotor {
      * @return position in double from 0 to 1
      */
     public double getPosition() {
-        return cancoder.getAbsolutePosition().getValueAsDouble(); // 0..1 rotations, absolute
-
+        return cancoder.getAbsolutePosition().getValueAsDouble();// 0..1 rotations, absolute
     }
 
     /**
@@ -306,10 +305,21 @@ public class SteerMotor {
     
 
     private double degreesToMotorRotations(double degrees) {
-        return (degrees / 360.0) / STEER_GEAR_REDUCTION;
+        return (degrees / 360.0);
+        // return (degrees / 360.0) / STEER_GEAR_REDUCTION;
     }
 
-    public static double fasterTurnDirection(double current, double target) {
+    /**
+    * Gets the current position of the motor in radians.
+    * 
+    * @return the current position in radians
+    */
+    private double getCurrentPositionRads() {
+        return getPosition() * 2.0 * Math.PI; // Convert from 0..1 rotations to radians
+    }
+
+    
+    public double fasterTurnDirection(double current, double target) {
 
         // Normalize the angles between 0 and 360
         current = ((current % 360) + 360) % 360;
@@ -334,7 +344,11 @@ public class SteerMotor {
      */
     public void setPosition(double targetRads) {
 
-        double rotorRotations = (targetRads / (2.0 * Math.PI)) * STEER_GEAR_REDUCTION;
+        double currentRads = getCurrentPositionRads(); 
+
+        double deltaRads = fasterTurnDirection(currentRads, targetRads);
+        double newTargetRads = currentRads + deltaRads;
+        double rotorRotations = (newTargetRads / (2.0 * Math.PI));
         positionRequest.withPosition(rotorRotations).withSlot(0);
         motor.setControl(positionRequest);
         publishStats();

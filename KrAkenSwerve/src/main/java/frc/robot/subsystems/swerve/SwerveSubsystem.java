@@ -23,31 +23,9 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.DebugConstants.DRIVE_DEBUG;
-import static frc.robot.Constants.DebugConstants.STEER_DEBUG;
-import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
-import static frc.robot.Constants.SwerveConstants.BL_DRIVE;
-import static frc.robot.Constants.SwerveConstants.BL_ENCODER;
-import static frc.robot.Constants.SwerveConstants.BL_OFFSET;
-import static frc.robot.Constants.SwerveConstants.BL_POS;
-import static frc.robot.Constants.SwerveConstants.BL_STEER;
-import static frc.robot.Constants.SwerveConstants.BR_DRIVE;
-import static frc.robot.Constants.SwerveConstants.BR_ENCODER;
-import static frc.robot.Constants.SwerveConstants.BR_OFFSET;
-import static frc.robot.Constants.SwerveConstants.BR_POS;
-import static frc.robot.Constants.SwerveConstants.BR_STEER;
-import static frc.robot.Constants.SwerveConstants.FL_DRIVE;
-import static frc.robot.Constants.SwerveConstants.FL_ENCODER;
-import static frc.robot.Constants.SwerveConstants.FL_OFFSET;
-import static frc.robot.Constants.SwerveConstants.FL_POS;
-import static frc.robot.Constants.SwerveConstants.FL_STEER;
-import static frc.robot.Constants.SwerveConstants.FR_DRIVE;
-import static frc.robot.Constants.SwerveConstants.FR_ENCODER;
-import static frc.robot.Constants.SwerveConstants.FR_OFFSET;
-import static frc.robot.Constants.SwerveConstants.FR_POS;
-import static frc.robot.Constants.SwerveConstants.FR_STEER;
-import static frc.robot.Constants.SwerveConstants.MAX_OMEGA;
-import static frc.robot.Constants.SwerveConstants.MAX_VEL;
+import static frc.robot.Constants.DebugConstants.*;
+import static frc.robot.Constants.LoggingConstants.*;
+import static frc.robot.Constants.SwerveConstants.*;
 import frc.robot.subsystems.Vision.TimestampedVisionUpdate;
 import frc.robot.util.GRTUtil;
 
@@ -200,6 +178,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Gets the module positions.
      * 
      * @return The array of module positions.
+     *         The angles are in radians, and the distances are in meters.
      */
     public SwerveModulePosition[] getModulePositions() {
         return new SwerveModulePosition[] {

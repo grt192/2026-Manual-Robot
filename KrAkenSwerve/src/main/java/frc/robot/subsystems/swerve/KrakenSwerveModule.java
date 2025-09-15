@@ -35,7 +35,7 @@ public class KrakenSwerveModule {
      *
      * @param drivePort The CAN ID of the drive motor
      * @param steerPort The CAN ID of the steer motor
-     * @param offsetRads The offset of the absolute encoder
+     * @param offsetRads The offset of the absolute encoder (0 for our cases)
      * @param canCoderPort The CAN ID of the steer motor encoder
      */
     public KrakenSwerveModule(int drivePort, int steerPort, double offsetRads, int canCoderPort) {
@@ -123,6 +123,7 @@ public class KrakenSwerveModule {
     public Rotation2d getWrappedAngle() {
         // returned a 0-1 value
         double angleDouble = steerMotor.getPosition();              // 0..1
+        
         double angleRads = (2.0 * Math.PI * angleDouble) - Math.PI; // [-π, π)
         // double wrappedAngleRads = MathUtil.angleModulus(angleRads + offsetRads);
         angleRads = MathUtil.angleModulus(angleRads + offsetRads);

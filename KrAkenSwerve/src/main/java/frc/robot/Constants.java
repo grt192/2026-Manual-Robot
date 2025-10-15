@@ -6,11 +6,18 @@ package frc.robot;
 
 import java.util.List;
 
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.Vision.CameraConfig;
 import frc.robot.util.AlignUtil;
+import frc.robot.util.PolynomialRegression;
 
 
 /**
@@ -280,4 +287,76 @@ public final class Constants {
 
     public static double distanceTolerance = .47; 
   }
+
+
+
+  public static class VisionConstants{
+
+    public static final double FIELD_X = 17.5482504;
+    public static final double FIELD_Y = 8.05561;
+    public static final double ROBOT_RADIUS = 0.762;
+
+    public static final double[] STD_DEV_DIST = new double[] {
+      0.75, 1.00, 1.3, 1.69, 2., 2.51, 2.78, 3.07, 3.54, 4.1, 4.52 
+    };
+
+    public static final double[] X_STD_DEV = new double[] {
+      0.002, 0.005, 0.007, 0.014, 0.029, 0.074, 0.101, 0.12, 0.151, 0.204, 0.287
+    };
+
+    public static final double[] Y_STD_DEV = new double[] {
+      0.002, 0.005, 0.013, 0.020, 0.067, 0.080, 0.095, 0.160, 0.206, 0.259, 0.288
+    };
+
+    public static final double[] O_STD_DEV = new double[] {
+      0.002, 0.004, 0.005, 0.011, 0.031, 0.4, 1.72, 1.89, 2.05, 2.443, 2.804
+    };
+
+    public static final Pose3d[] CAMERA_POSES = new Pose3d[] {
+      new Pose3d(0.254, 0, 0, new Rotation3d(0, 0, 0))
+    };
+
+    public static final CameraConfig[] cameraConfigs = new CameraConfig[]{
+      new CameraConfig(
+        "4",
+        new Transform3d(
+          0.254, 0, 0,
+          new Rotation3d(0, 0, 0)
+        ),
+        PoseStrategy.LOWEST_AMBIGUITY
+      )};//,
+    //   new CameraConfig(
+    //     "2",
+    //     new Transform3d(
+    //       0.0508, -0.0476,1.13,
+    //       new Rotation3d(Math.PI, -Math.PI * 8. / 9.,  0.)
+    //     ),
+    //     PoseStrategy.LOWEST_AMBIGUITY
+    //   ),
+    //   new CameraConfig(
+    //       "3",
+    //       new Transform3d(//11.3 in above ground
+    //         0.211, -0.2695, 0.28702 ,
+    //         new Rotation3d(0, 0., Math.PI / 180. * 19.)
+    //       ),
+    //       PoseStrategy.LOWEST_AMBIGUITY
+    //   ),
+    //   new CameraConfig(
+    //       "4",
+    //       new Transform3d(
+    //         0.127, 0, 1.13,
+    //         new Rotation3d(0, -Math.PI / 9., 0.)
+    //       ),
+    //       PoseStrategy.LOWEST_AMBIGUITY
+    //   )
+    // };
+
+    public static final PolynomialRegression xStdDevModel = new PolynomialRegression(
+      VisionConstants.STD_DEV_DIST,VisionConstants.X_STD_DEV,2);
+    public static final PolynomialRegression yStdDevModel = new PolynomialRegression(
+      VisionConstants.STD_DEV_DIST,VisionConstants.Y_STD_DEV,2);
+    public static final PolynomialRegression oStdDevModel = new PolynomialRegression(
+      VisionConstants.STD_DEV_DIST,VisionConstants.O_STD_DEV,1);
+  }
+
 }

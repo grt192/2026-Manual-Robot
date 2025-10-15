@@ -174,29 +174,7 @@ public class SteerMotor2 extends SubsystemBase{
         configureMotor();
         initNT(motorCAN);
     }
-    /**
-     * 
-     * @param C current rotations domain: 0-1
-     * @param T target rotations domain: 0-1
-     * @return MotorPosition target range: -1 - 1
-     */
-    public double getOptimalSteerTargetPosition(double C, double T){
 
-        double d1 = Math.abs((T+1)-C);//T+1 
-        double d2 = Math.abs((T) - C);//T
-        double d3 = Math.abs((T-1) - C);
-        double motorPos = 0;
-        if ((d1 <= d2)&&(d1 <= d3)){
-            motorPos = T+1;
-        } 
-        if ((d2 <= d1)&&(d2<=d3)){
-            motorPos = T;
-        }
-        if ((d3 <= d1)&&(d3<=d2)){
-            motorPos = T-1;
-        }
-        return motorPos;
-    }
 
     
     /**
@@ -205,20 +183,13 @@ public class SteerMotor2 extends SubsystemBase{
      */
     double controllerTargetRotations;
     public void setPosition(double targetWheelPosition){
-        gurtMotorPos = targetWheelPosition;
+        // gurtMotorPos = targetWheelPosition;
 
         targetWheelPosition = (targetWheelPosition / (2*Math.PI)) + .5;
         controllerTargetRotations = targetWheelPosition;
         // System.out.println("moved: " + gurtMotorPos);
         gurtMotorPos = targetWheelPosition;
 
-        targetWheelPosition = targetWheelPosition % 1;
-
-        //radians to rotations
-        // // motor.wra(motorCurrentPos);
-
-        // targetWheelPosition = getOptimalSteerTargetPosition(motorCurrentPos, targetWheelPosition);        
-        // targetPos = targetWheelPosition;
         positionRequest.withPosition(gurtMotorPos);
         motor.setControl(positionRequest);
         publishStats();

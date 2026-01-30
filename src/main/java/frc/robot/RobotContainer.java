@@ -69,22 +69,21 @@ public class RobotContainer {
         swerveSubsystem.setDrivePowers(
           driveController.getForwardPower(),
           driveController.getLeftPower(),
-          driveController.getRotatePower()
+          driveController.getRotatePower() * driveController.getSteerScale()
         );
-        }, 
+        },
         swerveSubsystem
       )
     );
-      
+
     driveController.getRelativeMode().whileTrue(
       new RunCommand(
         () -> {
           swerveSubsystem.setRobotRelativeDrivePowers(
             driveController.getForwardPower(),
             driveController.getLeftPower(),
-            driveController.getRotatePower()
+            driveController.getRotatePower() * driveController.getSteerScale()
           );
-          driveController.getRotatePower();
           }, swerveSubsystem)
     );
 

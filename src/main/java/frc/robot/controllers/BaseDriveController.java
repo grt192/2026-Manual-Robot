@@ -68,5 +68,12 @@ public abstract class BaseDriveController {
     public abstract Trigger getAlignToReef();
 
     public abstract Trigger getAlignToSource();
-    
+
+    /**
+     * Gets the current steer (rotation) scale factor based on D-pad input.
+     *
+     * @return A multiplier in (0, 1] applied to rotational power.
+     */
+    public abstract double getSteerScale();
+
 }

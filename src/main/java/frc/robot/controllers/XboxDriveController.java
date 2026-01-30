@@ -102,4 +102,9 @@ public class XboxDriveController extends BaseDriveController {
     public Trigger getAlignToSource() {
         return (Trigger) aButton;
     }
+
+    @Override
+    public double getSteerScale() {
+        return 1.0;
+    }
 }

@@ -144,6 +144,12 @@ public final class Constants {
     // Maximum velocity calculation: Kraken max RPM / gear ratio / 60 (convert to per second) * wheel circumference
     public static final double MAX_VEL = 6000.0 / SwerveDriveConstants.DRIVE_GEAR_REDUCTION / 60.0 * SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
     public static final double MAX_OMEGA = MAX_VEL / FL_POS.getNorm();
+
+    // Steer (rotation) speed limit multipliers when pressing D-pad
+    public static final double STEER_SCALE_UP    = 0.25;  // D-pad Up
+    public static final double STEER_SCALE_RIGHT = 0.50;  // D-pad Right
+    public static final double STEER_SCALE_DOWN  = 0.75;  // D-pad Down
+    public static final double STEER_SCALE_LEFT  = 1.00;  // D-pad Left (full speed)
     
 
 

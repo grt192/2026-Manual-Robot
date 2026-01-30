@@ -1,5 +1,7 @@
 package frc.robot.controllers;
 
+import frc.robot.Constants.SwerveConstants;
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -96,5 +98,19 @@ public class PS5DriveController extends BaseDriveController{
     @Override
     public Trigger getAlignToSource() {
         return square;
+    }
+
+    private double steerScale = 1.0;
+
+    @Override
+    public double getSteerScale() {
+        int pov = driveController.getHID().getPOV();
+        switch (pov) {
+            case 0:   steerScale = SwerveConstants.STEER_SCALE_UP;    break; // Up
+            case 90:  steerScale = SwerveConstants.STEER_SCALE_RIGHT; break; // Right
+            case 180: steerScale = SwerveConstants.STEER_SCALE_DOWN;  break; // Down
+            case 270: steerScale = SwerveConstants.STEER_SCALE_LEFT;  break; // Left
+        }
+        return steerScale;
     }
 }

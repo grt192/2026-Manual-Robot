@@ -37,16 +37,16 @@ public class railgun extends SubsystemBase {
     private TalonFX hoodMotor = new TalonFX(railgunConstants.hoodId, "can");
     private CANdi limit = new CANdi(railgunConstants.limitId, "can");
     //private final CANcoder hoodEncoder = new CANcoder(railgunConstants.hoodEncoderId, "can");
-    TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
-    TalonFXConfiguration upperConfig = new TalonFXConfiguration();
-    private final CANcoder upperEncoder = new CANcoder(railgunConstants.upperEncoderId, "can");
+    //TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
+    //TalonFXConfiguration upperConfig = new TalonFXConfiguration();
+    //private final CANcoder upperEncoder = new CANcoder(railgunConstants.upperEncoderId, "can");
 
     private VelocityVoltage spinner = new VelocityVoltage(0);
     private PositionTorqueCurrentFOC focThing = new PositionTorqueCurrentFOC(0);
     public SwerveSubsystem swerve;
 
     private double dist = 0;
-    double hoodAngle = railgunConstants.initHoodAngle;
+    //double hoodAngle = railgunConstants.initHoodAngle;
 
     boolean manual = true;
     
@@ -54,7 +54,7 @@ public class railgun extends SubsystemBase {
     public railgun(SwerveSubsystem s){
         //configNT();
         configure();
-        swerve = s;
+        //swerve = s;
         hoodMotor.setPosition(railgunConstants.initHoodAngle);
     }
 
@@ -188,13 +188,15 @@ public class railgun extends SubsystemBase {
            // hoodAngle = hoodMotor.getPosition().getValueAsDouble();
 
             //hood
-            if(arrow == 180 && hoodAngle - 0.014 >= railgunConstants.lowerAngle){
+            if(arrow == 180 /* && hoodAngle - 0.014 >= railgunConstants.lowerAngle*/){
                 //hoodAngle += 0.014;
                 hoodMotor.set(0.1);
                 
             }else if(arrow == 0 /*&& hoodAngle + 0.014 <= railgunConstants.upperAngle*/){
                 //hoodAngle -= 0.014;
                 hoodMotor.set(-0.1);
+            }else{
+                hoodMotor.set(0);
             }
             SmartDashboard.putNumber("help", hoodMotor.getAcceleration().getValueAsDouble());
 
@@ -206,7 +208,7 @@ public class railgun extends SubsystemBase {
 
         }else{
 
-            dist = swerve.getRobotPosition().getTranslation().getDistance(railgunConstants.hubPos.getTranslation());
+           /*  dist = swerve.getRobotPosition().getTranslation().getDistance(railgunConstants.hubPos.getTranslation());
 
             hoodAngle = calculateAngle(dist)/360;
             velocity = calculateVel(hoodAngle*360);
@@ -216,6 +218,7 @@ public class railgun extends SubsystemBase {
             }else{
                 spinner.Velocity = 0;
             }
+            */
 
         }
 
@@ -226,6 +229,7 @@ public class railgun extends SubsystemBase {
     }
 
     public void periodic(){
+        run();
         
         SmartDashboard.putNumber("Actual Velocity", spinner.Velocity);
         Logger.recordOutput("Actual_Velocity", spinner.Velocity);
@@ -234,7 +238,7 @@ public class railgun extends SubsystemBase {
         Logger.recordOutput("Req_Velocity", velocity/360);
 
         SmartDashboard.putNumber("Hood Rot", hoodMotor.getPosition().getValueAsDouble());
-        Logger.recordOutput("Hood_Pos", hoodAngle);
+        //Logger.recordOutput("Hood_Pos", hoodAngle);
 
         SmartDashboard.putNumber("X Distance", dist);
         //dist = SmartDashboard.getNumber("X Distance", dist);         // these guys

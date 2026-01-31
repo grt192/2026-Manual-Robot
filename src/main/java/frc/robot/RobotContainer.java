@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import frc.robot.Constants.VisionConstants;
 // frc imports
 import frc.robot.controllers.PS5DriveController;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 // Subsystems
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.Vision.CameraConfig;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -40,12 +43,16 @@ public class RobotContainer {
   private CommandPS5Controller mechController;
   private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
+  private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
+      VisionConstants.cameraConfigs[0]);
   private ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem(canivore);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
+
     constructDriveController();
     constructMechController();
     configureBindings();

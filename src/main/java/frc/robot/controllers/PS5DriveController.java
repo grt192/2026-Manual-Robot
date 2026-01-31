@@ -97,4 +97,8 @@ public class PS5DriveController extends BaseDriveController{
     public Trigger getAlignToSource() {
         return square;
     }
+
+    public Trigger triangle() {
+        return new Trigger(driveController.triangle());
+    }
 }

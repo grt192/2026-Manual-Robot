@@ -160,6 +160,13 @@ public final class Constants {
 
   
 
+  public static class CameraConstants {
+    public static final String DRIVER_CAMERA_NAME = "Climb Camera";
+    public static final String HOPPER_CAMERA_NAME = "Intake Camera";
+    public static final int DRIVER_CAMERA_ID = 0;
+    public static final int HOPPER_CAMERA_ID = 1;
+  }
+
   public static class LoggingConstants{
     public static final String SWERVE_TABLE = "SwerveStats";
     public static final String SENSOR_TABLE = "Sensors";

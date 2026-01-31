@@ -26,9 +26,14 @@ import com.ctre.phoenix6.CANBus;
 // import frc.robot.commands.intake.SetIntakePivotCommand;
 // import frc.robot.commands.hopper.HopperSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 
 
@@ -66,6 +71,12 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
     VisionConstants.cameraConfigs[0]
   );
+
+  // Camera switching
+  private UsbCamera intakeCamera;
+  private UsbCamera climbCamera;
+  private VideoSink cameraServer;
+  private boolean isintakeCameraActive = true;
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
@@ -75,8 +86,74 @@ public class RobotContainer {
     configureBindings();
     configureAutoChooser();
 
-    CameraServer.startAutomaticCapture(); // start driver cam
+    // Initialize cameras
+    intakeCamera = CameraServer.startAutomaticCapture(
+      Constants.CameraConstants.DRIVER_CAMERA_NAME,
+      Constants.CameraConstants.DRIVER_CAMERA_ID
+    );
+    climbCamera = CameraServer.startAutomaticCapture(
+      Constants.CameraConstants.HOPPER_CAMERA_NAME,
+      Constants.CameraConstants.HOPPER_CAMERA_ID
+    );
+    cameraServer = CameraServer.getServer();
+    cameraServer.setSource(intakeCamera);
+
     SmartDashboard.putData("Field", m_field);
+
+    // Add swerve drive visualization
+    SmartDashboard.putData("Swerve Drive", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+
+        builder.addDoubleProperty("Front Left Angle", () -> swerveSubsystem.getModuleStates()[0].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> swerveSubsystem.getModuleStates()[0].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Front Right Angle", () -> swerveSubsystem.getModuleStates()[1].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> swerveSubsystem.getModuleStates()[1].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Left Angle", () -> swerveSubsystem.getModuleStates()[2].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> swerveSubsystem.getModuleStates()[2].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Right Angle", () -> swerveSubsystem.getModuleStates()[3].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> swerveSubsystem.getModuleStates()[3].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Robot Angle", () -> swerveSubsystem.getRobotPosition().getRotation().getRadians(), null);
+      }
+    });
+  }
+
+  /**
+   * Switches between driver camera and hopper camera
+   */
+  private void switchCamera() {
+    if (isintakeCameraActive) {
+      cameraServer.setSource(climbCamera);
+      isintakeCameraActive = false;
+    } else {
+      cameraServer.setSource(intakeCamera);
+      isintakeCameraActive = true;
+    }
+  }
+
+  /**
+   * Gets the active alliance hub from FMS game-specific message
+   * @return "Red", "Blue", or "Unknown" based on FMS data
+   */
+  private String getActiveAllianceHub() {
+    String gameData = DriverStation.getGameSpecificMessage();
+    if (gameData.length() > 0) {
+      switch (gameData.charAt(0)) {
+        case 'B':
+          return "Blue";
+        case 'R':
+          return "Red";
+        default:
+          return "Unknown";                                                                                        
+      }
+    } else {
+      return "No FMS Data";
+    }
   }
 
   /**
@@ -89,6 +166,11 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    // Camera switching!
+    driveController.triangle().onTrue(
+      new InstantCommand(this::switchCamera)
+    );
+
       /* Driving -- One joystick controls translation, the other rotation. If the robot-relative button is held down,
       * the robot is controlled along its own axes, otherwise controls apply to the field axes by default. If the
       * swerve aim button is held down, the robot will rotate automatically to always face a target, and only
@@ -195,8 +277,19 @@ public class RobotContainer {
     Pose2d robotPose = swerveSubsystem.getRobotPosition();
     m_field.setRobotPose(robotPose);
 
+    // Battery voltage
+    SmartDashboard.putNumber("Status/Battery Voltage", RobotController.getBatteryVoltage());
+
     // Match time
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+    // Active alliance hub from FMS
+    SmartDashboard.putString("Status/Active Alliance Hub", getActiveAllianceHub());
+
+    // Camera
+    SmartDashboard.putString("Status/Active Camera",
+      isintakeCameraActive ? Constants.CameraConstants.DRIVER_CAMERA_NAME : Constants.CameraConstants.HOPPER_CAMERA_NAME
+    );
 
     // Intake
     // SmartDashboard.putString("Status/Intake State", getIntakeState());

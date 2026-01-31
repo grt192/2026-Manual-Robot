@@ -93,8 +93,8 @@ public class DriveMotor {
         ntInstance = NetworkTableInstance.getDefault();
         swerveStatsTable = ntInstance.getTable(SWERVE_TABLE);
         positionPublisher = swerveStatsTable.getDoubleTopic(canId + "position").publish();
-        targetRPSPublisher = swerveStatsTable.getDoubleTopic(canId + "targetRPS").publish();
-        veloErrorPublisher = swerveStatsTable.getDoubleTopic(canId + "veloError").publish();
+        targetRPSPublisher = swerveStatsTable.getDoubleTopic(canId + "motorRPM").publish();
+        // veloErrorPublisher = swerveStatsTable.getDoubleTopic(canId + "veloError").publish();
         veloPublisher = swerveStatsTable.getDoubleTopic(canId + "velo").publish();
         appliedVlotsPublisher = swerveStatsTable.getDoubleTopic(canId + "appliedVolts").publish();
         supplyCurrentPublisher = swerveStatsTable.getDoubleTopic(canId + "supplyCurrent").publish();
@@ -284,12 +284,12 @@ public class DriveMotor {
      */
     public void publishStats() {
         positionPublisher.set(getDistance());
-        targetRPSPublisher.set(targetRotationsPerSec);
-        veloErrorPublisher.set(0.0); // TODO: Calculate actual velocity error
+        targetRPSPublisher.set(motor.getVelocity().getValueAsDouble());
+        // veloErrorPublisher.set(0.0); // TODO: Calculate actual velocity error
         veloPublisher.set(getVelocity());
-        appliedVlotsPublisher.set(appliedVoltsSignal.getValueAsDouble());
-        supplyCurrentPublisher.set(supplyCurrentSignal.getValueAsDouble());
-        torqueCurrentPublisher.set(torqueCurrentSignal.getValueAsDouble());
+        appliedVlotsPublisher.set(motor.getMotorVoltage().getValueAsDouble());
+        supplyCurrentPublisher.set(motor.getSupplyCurrent().getValueAsDouble());
+        torqueCurrentPublisher.set(motor.getTorqueCurrent().getValueAsDouble());
     }
 
     /**

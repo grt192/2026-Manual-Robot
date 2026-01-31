@@ -261,7 +261,7 @@ public class SteerMotor {
   
         encoderPositionPublisher.set(cancoder.getPosition().getValueAsDouble());
         targetPositionPublisher.set(rotorRotations); // Just show current position for now
-        rotationPublisher.set(motor.getPosition().getValueAsDouble()); // get position
+        rotationPublisher.set(motor.getVelocity().getValueAsDouble()); // get position
         closedLoopReferencePublisher.set(motor.getClosedLoopReference().getValueAsDouble()); // TODO: Calculate actual position error
         
         motorTemperaturePublisher.set(getTemperature());

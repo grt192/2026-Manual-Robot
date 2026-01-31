@@ -161,30 +161,34 @@ public class SteerMotor2 extends SubsystemBase{
         // encoderPositionPublisher = steerStatsTable.getDoubleTopic(canId + "encoderPosition").publish();
         motorPositionPublisher = steerStatsTable.getDoubleTopic(canId + "motorPosition").publish();
         targetPositionPublisher = steerStatsTable.getDoubleTopic(canId + "targetPosition").publish();
-        // motorTemperaturePublisher = steerStatsTable.getDoubleTopic(canId + "motorTemperature").publish();
-        // appliedVoltsPublisher = steerStatsTable.getDoubleTopic(canId + "appliedVolts").publish();
-        // supplyCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "supplyCurrent").publish();
-        // torqueCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "torqueCurrent").publish();
+        motorTemperaturePublisher = steerStatsTable.getDoubleTopic(canId + "motorTemperature").publish();
+        appliedVoltsPublisher = steerStatsTable.getDoubleTopic(canId + "appliedVolts").publish();
+        supplyCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "supplyCurrent").publish();
+        torqueCurrentPublisher = steerStatsTable.getDoubleTopic(canId + "torqueCurrent").publish();
         // positionErrorPublisher = steerStatsTable.getDoubleTopic(canId + "positionError").publish();
-        rotationPublisher = steerStatsTable.getDoubleTopic(canId + "controllerTargetPosition").publish();
+        rotationPublisher = steerStatsTable.getDoubleTopic(canId + "motorRPM").publish();
         // closedLoopReferencePublisher = steerStatsTable.getDoubleTopic(canId + "targetMotorRotationPosition").publish();
-        gurtMotorPos1 = steerStatsTable.getDoubleTopic(canId + "motorPosThing").publish();
-        gurtMotorPos1.set(0.0);
-        positionControlPositionPublisher = steerStatsTable.getDoubleTopic(canId + "positionControlPosition").publish();
-        steerStatsTable.addListener( canId + "motorPosThing", EnumSet.of(NetworkTableEvent.Kind.kValueAll), (table, key, event) ->{
-            gurtMotorPos = event.valueData.value.getDouble();
-        });
+        // gurtMotorPos1 = steerStatsTable.getDoubleTopic(canId + "motorPosThing").publish();
+        // gurtMotorPos1.set(0.0);
+        // positionControlPositionPublisher = steerStatsTable.getDoubleTopic(canId + "positionControlPosition").publish();
+        // steerStatsTable.addListener( canId + "motorPosThing", EnumSet.of(NetworkTableEvent.Kind.kValueAll), (table, key, event) ->{
+        //     gurtMotorPos = event.valueData.value.getDouble();
+        // });
 
     }
 
     public void publishStats() {
 
         motorPositionPublisher.set(motor.getPosition().getValueAsDouble());
-        targetPositionPublisher.set(targetPos);
-
+        targetPositionPublisher.set(motor.getClosedLoopReference().getValueAsDouble());
+        rotationPublisher.set(motor.getVelocity().getValueAsDouble());
+        supplyCurrentPublisher.set(motor.getSupplyCurrent().getValueAsDouble());
+        motorTemperaturePublisher.set(motor.getDeviceTemp().getValueAsDouble());
+        torqueCurrentPublisher.set(motor.getTorqueCurrent().getValueAsDouble());
+        appliedVoltsPublisher.set(motor.getSupplyVoltage().getValueAsDouble());
         // encoderPositionPublisher.set(cancoder.getPosition().getValueAsDouble());
         // targetPositionPublisher.set(rotorRotations); // Just show current position for now
-        rotationPublisher.set(controllerTargetRotations); // get position
+        // rotationPublisher.set(controllerTargetRotations); // get position
         // closedLoopReferencePublisher.set(motor.getClosedLoopReference().getValueAsDouble()); // TODO: Calculate actual position error
         
         // positionErrorPublisher.set(0.0); // TODO: Calculate actual position error

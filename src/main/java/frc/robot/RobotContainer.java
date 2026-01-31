@@ -298,12 +298,15 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Status/At Top Limit", pivotIntake.isAtTopLimit());
     SmartDashboard.putBoolean("Status/At Bottom Limit", pivotIntake.isAtBottomLimit());
 
-    // Vision + Autoalign 
+    // Vision + Autoalign
     // VisionSubsystem is commented out rn because it's outdated
     SmartDashboard.putBoolean("Status/Target Detected", hasTarget());
     SmartDashboard.putBoolean("Status/Target Locked", isTargetLocked());
     SmartDashboard.putNumber("Status/Target Distance", getTargetDistance());
     SmartDashboard.putBoolean("Status/Auto Align Active", isAutoAlignActive());
+
+    // AprilTag Counter
+    SmartDashboard.putNumber("Vision/AprilTags Tracked", visionSubsystem1.getAprilTagCount());
   }
 
   // --- Intake state detection (commented out for now) ---

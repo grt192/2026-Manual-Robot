@@ -44,12 +44,10 @@ public class VisionSubsystem extends SubsystemBase {
     private IntegerArrayLogEntry tagIDLogEntry;
 
     private Consumer<TimestampedVisionUpdate> visionConsumer = (x) -> {};
-
+    
     private PolynomialRegression xStdDevModel = VisionConstants.xStdDevModel;
     private PolynomialRegression yStdDevModel = VisionConstants.yStdDevModel;
     private PolynomialRegression oStdDevModel = VisionConstants.oStdDevModel;
-
-    private int currentAprilTagCount = 0;
 
     public VisionSubsystem(CameraConfig cameraConfig) {
         // Initialize the camera with its name
@@ -78,19 +76,14 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Get all unread results in the queue from the camera
+        // Get all unread results in the queue from the camera 
         List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-
-        // Reset tag count at start of periodic
-        currentAprilTagCount = 0;
-
+        
         //Loops through all unread results
         for (PhotonPipelineResult result : results){
-
+            
             //checks if the camera detected any apriltags
             if (result.hasTargets()){
-                // Update the current AprilTag count
-                currentAprilTagCount = result.getTargets().size();
                 
                 double minDistance = Double.MAX_VALUE;
                 long[] tagIDs = new long[result.getTargets().size()];
@@ -161,14 +154,6 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setInterface(Consumer<TimestampedVisionUpdate> consumer){
         visionConsumer = consumer;//thiing for vision to interface with the swerve subsystem
-    }
-
-    /**
-     * Gets the number of AprilTags currently being tracked by the camera
-     * @return count of AprilTags detected in the most recent frame
-     */
-    public int getAprilTagCount() {
-        return currentAprilTagCount;
     }
 
     /**

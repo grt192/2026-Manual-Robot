@@ -132,6 +132,10 @@ public class PivotIntakeSubsystem extends SubsystemBase {
     pivotMotor.setControl(dutyCycleControl.withOutput(speed));
   }
 
+  public void resetPosition() {
+    pivotMotor.setPosition(0);
+  }
+
   public void stop() {
     pivotMotor.setControl(dutyCycleControl.withOutput(0));
   }

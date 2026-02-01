@@ -181,6 +181,11 @@ public class RobotContainer {
      )
    );
 
+    // Triangle - reset pivot encoder position to 0
+    mechController.triangle().onTrue(
+      new InstantCommand(() -> pivotIntake.resetPosition(), pivotIntake)
+    );
+
 
 
   }

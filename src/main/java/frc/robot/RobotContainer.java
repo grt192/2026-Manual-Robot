@@ -131,7 +131,7 @@ public class RobotContainer {
     // );
 
   // circle for the manual hopper
-    mechController.circle().whileTrue(
+    mechController.square().whileTrue(
       new RunCommand(
         () -> HopperSubsystem.setManualControl(1.0),
         HopperSubsystem

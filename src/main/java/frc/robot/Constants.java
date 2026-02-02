@@ -151,28 +151,26 @@ public final class Constants {
     // CANdle
     public static final int CANDLE_ID = 13;
 
-    // --- Position control (commented out for now) ---
-    // public static final double STOWED_POS = 0.0;
-    // public static final double EXTENDED_POS = 0.25;
-    // public static final int ENCODER_ID = 0;
-    // public static final double GEAR_RATIO = 14.0;
-    // public static final double PIVOT_P = 0.01;
-    // public static final double PIVOT_I = 0.0;
-    // public static final double PIVOT_D = 0.0;
-    // public static final double PIVOT_F = 0.0;
-    // public static final double PIVOT_MAX_CURRENT = 40.0;
-    // public static final double PIVOT_CURRENT_LIMIT = 60.0;
-    // public static final double MANUAL_TORQUE_CURRENT = 0.0;
-    // public static final double PIVOT_SUPPLY_CURRENT_LIMIT = 40.0;
-    // public static final double POSITION_TOLERANCE = 0.02;
+    public static final double STOWED_POS = 0.0;
+    public static final double EXTENDED_POS = 0.25;
+    public static final int ENCODER_ID = 0;
+    public static final double GEAR_RATIO = 14.0;
+    public static final double PIVOT_P = 0.01;
+    public static final double PIVOT_I = 0.0;
+    public static final double PIVOT_D = 0.0;
+    public static final double PIVOT_F = 0.0;
+    public static final double PIVOT_MAX_CURRENT = 40.0;
+    public static final double PIVOT_CURRENT_LIMIT = 60.0;
+    public static final double MANUAL_TORQUE_CURRENT = 0.0;
+    public static final double PIVOT_SUPPLY_CURRENT_LIMIT = 40.0;
+    public static final double POSITION_TOLERANCE = 0.02;
   }
 
   public static class HopperConstants {
     public static final int KRAKEN_CAN_ID = 14;
 
-    // --- RPM control (commented out for now) ---
-    // public static final double TARGET_RPM = 3000.0;
-    // public static final double HOPPER_SPEED = 2.0;
+    public static final double TARGET_RPM = 3000.0;
+    public static final double HOPPER_SPEED = 2.0;
 
     public static final int SUPPLY_CURRENT_LIMIT = 80;
     public static final int STATOR_CURRENT_LIMIT = 60;

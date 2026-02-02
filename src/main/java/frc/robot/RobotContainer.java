@@ -13,15 +13,15 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.Intake.RollerIntakeSubsystem;
 import frc.robot.subsystems.Intake.PivotIntakeSubsystem;
 import frc.robot.subsystems.hopper.HopperSubsystem;
-// import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.IntakeConstants;
 
 // Commands
 import frc.robot.commands.intake.ManualIntakePivotCommand;
 
 import com.ctre.phoenix6.CANBus;
 
-// import frc.robot.commands.intake.SetIntakePivotCommand;
-// import frc.robot.commands.hopper.HopperSetRPMCommand;
+import frc.robot.commands.intake.SetIntakePivotCommand;
+import frc.robot.commands.hopper.HopperSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -122,16 +122,15 @@ public class RobotContainer {
       swerveSubsystem
     );
 
-    // --- Intake pivot set-position controls (commented out for now) ---
-    // mechController.square().onTrue(
-    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.STOWED_POS)
-    // );
-    // mechController.cross().onTrue(
-    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.EXTENDED_POS)
-    // );
+    mechController.square().onTrue(
+      new SetIntakePivotCommand(pivotIntake, IntakeConstants.STOWED_POS)
+    );
+    mechController.cross().onTrue(
+      new SetIntakePivotCommand(pivotIntake, IntakeConstants.EXTENDED_POS)
+    );
 
   // circle for the manual hopper
-    mechController.square().whileTrue(
+    mechController.circle().whileTrue(
       new RunCommand(
         () -> HopperSubsystem.setManualControl(1.0),
         HopperSubsystem
@@ -143,10 +142,9 @@ public class RobotContainer {
       )
     );
 
-    // --- Hopper RPM control (commented out for now) ---
-    // mechController.triangle().onTrue(
-    //   new HopperSetRPMCommand(HopperSubsystem)
-    // );
+    mechController.triangle().onTrue(
+      new HopperSetRPMCommand(HopperSubsystem)
+    );
 
     /* Intake Controls - Hold button to run rollers */
     // R1 - intake in
@@ -181,11 +179,6 @@ public class RobotContainer {
      )
    );
 
-    // Triangle - reset pivot encoder position to 0
-  //  mechController.triangle().onTrue(
-    //  new InstantCommand(() -> pivotIntake.resetPosition(), pivotIntake)
-    //);
-
 
 
   }
@@ -200,8 +193,8 @@ public class RobotContainer {
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
     // Intake
-    // SmartDashboard.putString("Status/Intake State", getIntakeState());
-    // SmartDashboard.putNumber("Status/Intake Angle", pivotIntake.getAngleDegrees());
+    SmartDashboard.putString("Status/Intake State", getIntakeState());
+    SmartDashboard.putNumber("Status/Intake Angle", pivotIntake.getAngleDegrees());
     SmartDashboard.putBoolean("Status/Roller Active", isRollerActive());
     SmartDashboard.putBoolean("Status/At Top Limit", pivotIntake.isAtTopLimit());
     SmartDashboard.putBoolean("Status/At Bottom Limit", pivotIntake.isAtBottomLimit());
@@ -214,18 +207,17 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Status/Auto Align Active", isAutoAlignActive());
   }
 
-  // --- Intake state detection (commented out for now) ---
-  // private String getIntakeState() {
-  //   double angle = pivotIntake.getAngleDegrees();
-  //   double tolerance = 0.05;
-  //   if (Math.abs(angle - IntakeConstants.STOWED_POS) < tolerance) {
-  //     return "STOWED";
-  //   } else if (Math.abs(angle - IntakeConstants.EXTENDED_POS) < tolerance) {
-  //     return "EXTENDED";
-  //   } else {
-  //     return "MOVING";
-  //   }
-  // }
+  private String getIntakeState() {
+    double angle = pivotIntake.getAngleDegrees();
+    double tolerance = 0.05;
+    if (Math.abs(angle - IntakeConstants.STOWED_POS) < tolerance) {
+      return "STOWED";
+    } else if (Math.abs(angle - IntakeConstants.EXTENDED_POS) < tolerance) {
+      return "EXTENDED";
+    } else {
+      return "MOVING";
+    }
+  }
 
 
   private boolean isRollerActive() {

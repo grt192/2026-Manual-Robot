@@ -129,6 +129,7 @@ public final class Constants {
     public static final int ROLLER_CAN_ID = 1;
     public static final double ROLLER_IN_SPEED = 0.5;
     public static final double ROLLER_OUT_SPEED = -0.5;
+    public static final double ROLLER_TARGET_RPM = 2000.0;
     public static final double ROLLER_CURRENT_LIMIT = 100.;
     public static final double ROLLER_STATOR_CURRENT_LIMIT = 120.;
     public static final double ROLLER_OPEN_LOOP_RAMP = 0.05;

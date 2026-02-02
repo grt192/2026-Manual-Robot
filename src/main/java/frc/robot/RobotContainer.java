@@ -21,7 +21,7 @@ import frc.robot.commands.intake.ManualIntakePivotCommand;
 import com.ctre.phoenix6.CANBus;
 
 import frc.robot.commands.intake.SetIntakePivotCommand;
-import frc.robot.commands.hopper.HopperSetRPMCommand;
+import frc.robot.commands.intake.IntakeSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -142,8 +142,13 @@ public class RobotContainer {
       )
     );
 
-    mechController.triangle().onTrue(
-      new HopperSetRPMCommand(HopperSubsystem)
+    mechController.triangle().whileTrue(
+      new IntakeSetRPMCommand(intakeSubsystem)
+    ).onFalse(
+      new InstantCommand(
+        () -> intakeSubsystem.stop(),
+        intakeSubsystem
+      )
     );
 
     /* Intake Controls - Hold button to run rollers */

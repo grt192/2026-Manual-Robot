@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import static edu.wpi.first.units.Units.Amps;
@@ -20,6 +21,7 @@ import frc.robot.Constants.IntakeConstants;
 public class RollerIntakeSubsystem extends SubsystemBase {
     private TalonFX rollerMotor;
     private final DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
     private TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
@@ -76,6 +78,22 @@ public class RollerIntakeSubsystem extends SubsystemBase {
      */
     public void stop() {
         rollerMotor.setControl(dutyCycleRequest.withOutput(0));
+    }
+
+  // Auto rollers at set rmp!
+    public void spinAtTargetRPM() {
+        double rotationsPerSecond = IntakeConstants.ROLLER_TARGET_RPM / 60.0;
+        rollerMotor.setControl(velocityRequest.withVelocity(rotationsPerSecond));
+    }
+
+    public void spinAtRPM(double rpm) {
+        double rotationsPerSecond = rpm / 60.0;
+        rollerMotor.setControl(velocityRequest.withVelocity(rotationsPerSecond));
+    }
+
+   
+    public double getCurrentRPM() {
+        return rollerMotor.getVelocity().getValueAsDouble() * 60.0;
     }
 
     //Check if the roller is currently running

@@ -6,7 +6,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+// import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,12 +19,12 @@ import frc.robot.Constants.HopperConstants;
 public class HopperSubsystem extends SubsystemBase {
 
     private final TalonFX krakenMotor;
-    private final VelocityVoltage velocityControl;
+    // private final VelocityVoltage velocityControl;
     private final DutyCycleOut dutyCycleControl;
 
     public HopperSubsystem(CANBus canBus) {
         krakenMotor = new TalonFX(HopperConstants.KRAKEN_CAN_ID, canBus);
-        velocityControl = new VelocityVoltage(0);
+        // velocityControl = new VelocityVoltage(0);
         dutyCycleControl = new DutyCycleOut(0);
 
         configureMotor();
@@ -54,19 +54,20 @@ public class HopperSubsystem extends SubsystemBase {
     }
     
 
-    public void spinAtTargetRPM() {
-        double rotationsPerSecond = HopperConstants.TARGET_RPM / 60.0;
-        krakenMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
-    }
-
-    public void spinAtRPM(double rpm) {
-        double rotationsPerSecond = rpm / 60.0;
-        krakenMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
-    }
-
-    public double getCurrentRPM() {
-        return krakenMotor.getVelocity().getValueAsDouble() * 60.0;
-    }
+    // --- RPM control methods (commented out for now) ---
+    // public void spinAtTargetRPM() {
+    //     double rotationsPerSecond = HopperConstants.TARGET_RPM / 60.0;
+    //     krakenMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
+    // }
+    //
+    // public void spinAtRPM(double rpm) {
+    //     double rotationsPerSecond = rpm / 60.0;
+    //     krakenMotor.setControl(velocityControl.withVelocity(rotationsPerSecond));
+    // }
+    //
+    // public double getCurrentRPM() {
+    //     return krakenMotor.getVelocity().getValueAsDouble() * 60.0;
+    // }
 
     public void setManualControl(double percentOutput) {
         percentOutput = Math.max(-1.0, Math.min(1.0, percentOutput));
@@ -85,7 +86,7 @@ public class HopperSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Hopper/CurrentRPM", getCurrentRPM());
+        // SmartDashboard.putNumber("Hopper/CurrentRPM", getCurrentRPM());
         SmartDashboard.putNumber("Hopper/MotorOutput", getMotorOutput());
         SmartDashboard.putNumber("Hopper/Velocity", krakenMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Hopper/Current", krakenMotor.getStatorCurrent().getValueAsDouble());

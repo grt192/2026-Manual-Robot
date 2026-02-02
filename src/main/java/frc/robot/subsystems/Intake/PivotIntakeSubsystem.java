@@ -62,13 +62,13 @@ public class PivotIntakeSubsystem extends SubsystemBase {
     );
 
     // Config software limits 
-    config.withSoftwareLimitSwitch(
-      new SoftwareLimitSwitchConfigs()
-          .withForwardSoftLimitEnable(true)
-          .withForwardSoftLimitThreshold(IntakeConstants.TOP_LIMIT)
-          .withReverseSoftLimitEnable(true)
-          .withReverseSoftLimitThreshold(IntakeConstants.BOTTOM_LIMIT)
-    );
+  //  config.withSoftwareLimitSwitch(
+    //  new SoftwareLimitSwitchConfigs()
+      //    .withForwardSoftLimitEnable(true)
+        //  .withForwardSoftLimitThreshold(IntakeConstants.TOP_LIMIT)
+          //.withReverseSoftLimitEnable(true)
+          //.withReverseSoftLimitThreshold(IntakeConstants.BOTTOM_LIMIT)
+    //);
 
     pivotMotor.getConfigurator().apply(config);
   }

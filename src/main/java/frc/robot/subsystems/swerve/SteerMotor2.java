@@ -1,7 +1,10 @@
 package frc.robot.subsystems.swerve;
 
 import static frc.robot.Constants.SwerveSteerConstants.STEER_GEAR_REDUCTION;
-import static frc.robot.Constants.SwerveSteerConstants.STEER_PEAK_CURRENT;
+import static frc.robot.Constants.SwerveSteerConstants.STEER_TORQUE_CURRENT_LIMIT;
+import static frc.robot.Constants.SwerveSteerConstants.STEER_SUPPLY_CURRENT_LIMIT;
+import static frc.robot.Constants.SwerveSteerConstants.STEER_SUPPLY_CURRENT_LOWER_LIMIT;
+import static frc.robot.Constants.SwerveSteerConstants.STEER_SUPPLY_CURRENT_LOWER_TIME;
 import static frc.robot.Constants.SwerveSteerConstants.STEER_RAMP_RATE;
 import static frc.robot.Constants.SwerveSteerConstants.STEER_CRUISE_VELOCITY;
 import static frc.robot.Constants.SwerveSteerConstants.STEER_ACCELERATION;
@@ -11,7 +14,6 @@ import java.util.EnumSet;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -21,7 +23,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -78,8 +79,8 @@ public class SteerMotor2 extends SubsystemBase{
 
     private void configureMotor() {
         // Set peak current for torque limiting for stall prevention
-        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = STEER_PEAK_CURRENT;
-        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = - STEER_PEAK_CURRENT;
+        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = STEER_TORQUE_CURRENT_LIMIT;
+        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = -STEER_TORQUE_CURRENT_LIMIT;
 
         // How fast can the code change torque for the motor
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = STEER_RAMP_RATE;
@@ -87,8 +88,14 @@ public class SteerMotor2 extends SubsystemBase{
         // By Default Robot will not move
         motorConfig.ClosedLoopGeneral.ContinuousWrap = true;
         motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-         // required if motor spins opposite 
+         // required if motor spins opposite
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        // Supply current limiting to prevent brownouts
+        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        motorConfig.CurrentLimits.SupplyCurrentLimit = STEER_SUPPLY_CURRENT_LIMIT;
+        motorConfig.CurrentLimits.SupplyCurrentLowerLimit = STEER_SUPPLY_CURRENT_LOWER_LIMIT;
+        motorConfig.CurrentLimits.SupplyCurrentLowerTime = STEER_SUPPLY_CURRENT_LOWER_TIME;
  
 
         // motorConfig.Slot0.kP = 3;

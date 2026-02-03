@@ -63,7 +63,7 @@ public class RobotContainer {
 
   private final CANBus canivore = new CANBus("can");
   private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
-  private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
+  private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem(canivore);
   private final HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
   private final Field2d m_field = new Field2d();
 

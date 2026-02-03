@@ -7,7 +7,6 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -26,7 +25,10 @@ import frc.robot.util.GRTUtil;
 
 import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_TORQUE_CURRENT_LIMIT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_SUPPLY_CURRENT_LOWER_LIMIT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_SUPPLY_CURRENT_LOWER_TIME;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_RAMP_RATE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
 
@@ -140,14 +142,20 @@ public class DriveMotor {
     public void configureMotor(){
 
         // Set peak current for torque limiting for stall prevention
-        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_PEAK_CURRENT;
-        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = - DRIVE_PEAK_CURRENT;
+        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_TORQUE_CURRENT_LIMIT;
+        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = -DRIVE_TORQUE_CURRENT_LIMIT;
 
         // How fast can the code change torque for the motor
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = DRIVE_RAMP_RATE;
 
-        // By Default Robot will not move 
+        // By Default Robot will not move
         motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        // Supply current limiting to prevent brownouts
+        motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        motorConfig.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
+        motorConfig.CurrentLimits.SupplyCurrentLowerLimit = DRIVE_SUPPLY_CURRENT_LOWER_LIMIT;
+        motorConfig.CurrentLimits.SupplyCurrentLowerTime = DRIVE_SUPPLY_CURRENT_LOWER_TIME;
 
         // Apply motor config with retries (max 5 attempts)
         for (int i = 0; i < 5; i++) {

@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import org.littletonrobotics.junction.Logger;
 
 public class flywheel extends SubsystemBase {
 
@@ -29,15 +30,22 @@ public class flywheel extends SubsystemBase {
         TalonFXConfiguration cfg = new TalonFXConfiguration();
         //cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        FeedbackConfigs b = new FeedbackConfigs();
-        b.SensorToMechanismRatio = 3;
-        CurrentLimitsConfigs currLim = new CurrentLimitsConfigs().withStatorCurrentLimit(40.0).withStatorCurrentLimitEnable(true);
-        cfg.withCurrentLimits(currLim);
+        //FeedbackConfigs b = new FeedbackConfigs();
+        //b.SensorToMechanismRatio = 3;
+        //CurrentLimitsConfigs currLim = new CurrentLimitsConfigs().withStatorCurrentLimit(40.0).withStatorCurrentLimitEnable(true);
+        //cfg.withCurrentLimits(currLim);
         upperMotor.getConfigurator().apply(cfg);
-        upperMotor.getConfigurator().apply(b);
+
+        //upperMotor.getConfigurator().apply(b);
     }
 
     public void flySpeed(double speed){
         upperMotor.setControl(dutyCycl.withOutput(speed));
+    }
+
+    @Override
+    public void periodic(){
+        System.out.println(upperMotor.getVelocity());
+        Logger.recordOutput("FlySpeed", upperMotor.getVelocity().getValueAsDouble());
     }
 }

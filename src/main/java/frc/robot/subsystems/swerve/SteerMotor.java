@@ -30,6 +30,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GRTUtil;
 
@@ -217,14 +218,35 @@ public class SteerMotor extends SubsystemBase{
 
     public void logStats() {
         long ts = GRTUtil.getFPGATime();
-        positionLogEntry.append(motor.getPosition().getValueAsDouble(), ts);
-        velocityLogEntry.append(motor.getVelocity().getValueAsDouble() * STEER_GEAR_REDUCTION * 60.0, ts);
+
+        double position = motor.getPosition().getValueAsDouble();
+        double velocityRPM = motor.getVelocity().getValueAsDouble() * STEER_GEAR_REDUCTION * 60.0;
+        double appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        double supplyCurrent = motor.getSupplyCurrent().getValueAsDouble();
+        double torqueCurrent = motor.getTorqueCurrent().getValueAsDouble();
+        double temperature = motor.getDeviceTemp().getValueAsDouble();
+        double closedLoopError = motor.getClosedLoopError().getValueAsDouble();
+
+        // DataLog
+        positionLogEntry.append(position, ts);
+        velocityLogEntry.append(velocityRPM, ts);
         targetPositionLogEntry.append(gurtMotorPos, ts);
-        appliedVoltsLogEntry.append(motor.getMotorVoltage().getValueAsDouble(), ts);
-        supplyCurrentLogEntry.append(motor.getSupplyCurrent().getValueAsDouble(), ts);
-        torqueCurrentLogEntry.append(motor.getTorqueCurrent().getValueAsDouble(), ts);
-        temperatureLogEntry.append(motor.getDeviceTemp().getValueAsDouble(), ts);
-        closedLoopErrorLogEntry.append(motor.getClosedLoopError().getValueAsDouble(), ts);
+        appliedVoltsLogEntry.append(appliedVolts, ts);
+        supplyCurrentLogEntry.append(supplyCurrent, ts);
+        torqueCurrentLogEntry.append(torqueCurrent, ts);
+        temperatureLogEntry.append(temperature, ts);
+        closedLoopErrorLogEntry.append(closedLoopError, ts);
+
+        // SmartDashboard
+        String prefix = "Steer/" + motorID + "/";
+        SmartDashboard.putNumber(prefix + "Position", position);
+        SmartDashboard.putNumber(prefix + "VelocityRPM", velocityRPM);
+        SmartDashboard.putNumber(prefix + "TargetPosition", gurtMotorPos);
+        SmartDashboard.putNumber(prefix + "AppliedVolts", appliedVolts);
+        SmartDashboard.putNumber(prefix + "SupplyCurrent", supplyCurrent);
+        SmartDashboard.putNumber(prefix + "TorqueCurrent", torqueCurrent);
+        SmartDashboard.putNumber(prefix + "Temperature", temperature);
+        SmartDashboard.putNumber(prefix + "ClosedLoopError", closedLoopError);
     }
     /**
      * 

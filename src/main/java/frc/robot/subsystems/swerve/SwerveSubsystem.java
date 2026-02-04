@@ -383,16 +383,25 @@ public class SwerveSubsystem extends SubsystemBase {
     private void logStats() {
         long ts = GRTUtil.getFPGATime();
 
-        // Subsystem-level
-        poseLogEntry.append(estimatedPose, ts);
-        gyroHeadingLogEntry.append(getGyroHeading().getDegrees(), ts);
-        steerCruiseRPMLogEntry.append(currentCruiseVelocityRPM, ts);
-
-        // Chassis speeds
+        double gyroHeading = getGyroHeading().getDegrees();
         ChassisSpeeds speeds = getRobotRelativeChassisSpeeds();
+
+        // DataLog - Subsystem-level
+        poseLogEntry.append(estimatedPose, ts);
+        gyroHeadingLogEntry.append(gyroHeading, ts);
+        steerCruiseRPMLogEntry.append(currentCruiseVelocityRPM, ts);
         chassisVxLogEntry.append(speeds.vxMetersPerSecond, ts);
         chassisVyLogEntry.append(speeds.vyMetersPerSecond, ts);
         chassisOmegaLogEntry.append(speeds.omegaRadiansPerSecond, ts);
+
+        // SmartDashboard - Subsystem-level
+        SmartDashboard.putNumber("Swerve/PoseX", estimatedPose.getX());
+        SmartDashboard.putNumber("Swerve/PoseY", estimatedPose.getY());
+        SmartDashboard.putNumber("Swerve/PoseRotation", estimatedPose.getRotation().getDegrees());
+        SmartDashboard.putNumber("Swerve/GyroHeading", gyroHeading);
+        SmartDashboard.putNumber("Swerve/ChassisVx", speeds.vxMetersPerSecond);
+        SmartDashboard.putNumber("Swerve/ChassisVy", speeds.vyMetersPerSecond);
+        SmartDashboard.putNumber("Swerve/ChassisOmega", speeds.omegaRadiansPerSecond);
 
         // Per-module logging
         frontLeftModule.logStats();

@@ -149,5 +149,6 @@ public class flywheel extends SubsystemBase {
 
         // Connection status
         Logger.recordOutput(LOG_PREFIX + "Connected", upperMotor.isConnected());
+        Logger.recordOutput("Torque", upperMotor.getTorqueCurrent().getValueAsDouble() * upperMotor.getMotorKT().getValueAsDouble());
     }
 }

@@ -359,6 +359,12 @@ public final class Constants {
     );
   }
 
+  // ==================== POWER ====================
+
+  public static class PDHConstants {
+    public static final int PDH_CAN_ID = 1;
+  }
+
   // ==================== LOGGING & DEBUG ====================
 
   public static class LoggingConstants {

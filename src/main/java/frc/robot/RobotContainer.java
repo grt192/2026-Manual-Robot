@@ -18,6 +18,8 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.Intake.RollerIntakeSubsystem;
 import frc.robot.subsystems.Intake.PivotIntakeSubsystem;
 import frc.robot.subsystems.hopper.HopperSubsystem;
+import frc.robot.subsystems.PDHSubsystem;
+import frc.robot.Constants.PDHConstants;
 // import frc.robot.Constants.IntakeConstants;
 
 // Commands
@@ -65,6 +67,7 @@ public class RobotContainer {
   private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
   private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
   private final HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
+  private final PDHSubsystem pdhSubsystem = new PDHSubsystem(PDHConstants.PDH_CAN_ID);
   private final Field2d m_field = new Field2d();
 
   // private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(

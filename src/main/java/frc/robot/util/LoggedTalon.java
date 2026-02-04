@@ -62,9 +62,9 @@ public class LoggedTalon{
     private double targetDutyCycle;
 
     public LoggedTalon(
-        int canId, com.ctre.phoenix6.CANBus canBus, TalonFXConfiguration talonConfig
+        int canId, String canBusName, TalonFXConfiguration talonConfig
     ){
-        motor = new TalonFX(canId, canBus);
+        motor = new TalonFX(canId, canBusName);
         for (int i = 0; i < 4; i++) {
             boolean error =
                 motor.getConfigurator()

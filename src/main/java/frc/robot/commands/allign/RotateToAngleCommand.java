@@ -53,7 +53,7 @@ public class RotateToAngleCommand extends Command {
 
         SmartDashboard.putNumber("RotateToAngle/Goal", targetDegrees);
         SmartDashboard.putNumber("RotateToAngle/Actual", currentAngle);
-        SmartDashboard.putNumber("RotateToAngle/Error", pid.getError());
+        SmartDashboard.putNumber("RotateToAngle/Error", pid.getPositionError());
     }
 
     @Override

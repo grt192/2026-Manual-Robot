@@ -10,7 +10,6 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -56,14 +55,6 @@ public class SwerveSubsystem extends SubsystemBase {
     private Timer lockTimer;
     private double currentCruiseVelocityRPM = STEER_CRUISE_VELOCITY * STEER_GEAR_REDUCTION * 60.0;
 
-    // Acceleration and velocity limiting
-    private SlewRateLimiter xLimiter;
-    private SlewRateLimiter yLimiter;
-    private SlewRateLimiter omegaLimiter;
-    private double currentAccelLimit = DEFAULT_ACCEL_LIMIT;
-    private double currentAngularAccelLimit = DEFAULT_ANGULAR_ACCEL_LIMIT;
-    private double velocityMultiplier = DEFAULT_VELOCITY_MULTIPLIER;
-
     // DataLog entries
     private StructLogEntry<Pose2d> poseLogEntry;
     private DoubleLogEntry gyroHeadingLogEntry;
@@ -105,11 +96,6 @@ public class SwerveSubsystem extends SubsystemBase {
             getModulePositions(),
             new Pose2d()
             );
-
-        // Initialize acceleration limiters
-        xLimiter = new SlewRateLimiter(DEFAULT_ACCEL_LIMIT);
-        yLimiter = new SlewRateLimiter(DEFAULT_ACCEL_LIMIT);
-        omegaLimiter = new SlewRateLimiter(DEFAULT_ANGULAR_ACCEL_LIMIT);
 
         // buildAuton();
         initNT();
@@ -178,20 +164,10 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param angularPower [-1, 1] The rotational power.
      */
     public void setDrivePowers(double xPower, double yPower, double angularPower) {
-        // Apply velocity multiplier and convert to m/s
-        double targetVx = xPower * MAX_VEL * velocityMultiplier;
-        double targetVy = yPower * MAX_VEL * velocityMultiplier;
-        double targetOmega = angularPower * MAX_OMEGA * velocityMultiplier;
-
-        // Apply acceleration limiting
-        double limitedVx = xLimiter.calculate(targetVx);
-        double limitedVy = yLimiter.calculate(targetVy);
-        double limitedOmega = omegaLimiter.calculate(targetOmega);
-
         ChassisSpeeds speeds = ChassisSpeeds.fromRobotRelativeSpeeds(
-            limitedVx,
-            limitedVy,
-            limitedOmega,
+            xPower * MAX_VEL, 
+            yPower * MAX_VEL, 
+            angularPower * MAX_OMEGA,
             getDriverHeading()
         );
 
@@ -200,6 +176,8 @@ public class SwerveSubsystem extends SubsystemBase {
             states, speeds,
             MAX_VEL, MAX_VEL, MAX_OMEGA
         );
+        
+        
     }
 
         /** Executes swerve X locking, putting swerve's wheels into an X configuration to prevent motion.
@@ -352,73 +330,6 @@ public class SwerveSubsystem extends SubsystemBase {
         frontRightModule.setSteerCruiseVelocity(velocity);
         backLeftModule.setSteerCruiseVelocity(velocity);
         backRightModule.setSteerCruiseVelocity(velocity);
-    }
-
-    /**
-     * Sets the maximum velocity as a fraction of MAX_VEL.
-     * @param multiplier [0, 1] fraction of max velocity. 1.0 = full speed, 0.5 = half speed.
-     */
-    public void setVelocityMultiplier(double multiplier) {
-        this.velocityMultiplier = Math.max(0, Math.min(1, multiplier));
-    }
-
-    /**
-     * Gets the current velocity multiplier.
-     * @return The velocity multiplier [0, 1].
-     */
-    public double getVelocityMultiplier() {
-        return velocityMultiplier;
-    }
-
-    /**
-     * Sets the acceleration limit for translational movement.
-     * @param accelLimit The max rate of velocity change in m/s per second.
-     */
-    public void setAccelerationLimit(double accelLimit) {
-        currentAccelLimit = accelLimit;
-        double lastX = xLimiter.lastValue();
-        double lastY = yLimiter.lastValue();
-        xLimiter = new SlewRateLimiter(accelLimit);
-        yLimiter = new SlewRateLimiter(accelLimit);
-        xLimiter.reset(lastX);
-        yLimiter.reset(lastY);
-    }
-
-    /**
-     * Sets the angular acceleration limit for rotation.
-     * @param angularAccelLimit The max rate of angular velocity change in rad/s per second.
-     */
-    public void setAngularAccelerationLimit(double angularAccelLimit) {
-        currentAngularAccelLimit = angularAccelLimit;
-        double lastOmega = omegaLimiter.lastValue();
-        omegaLimiter = new SlewRateLimiter(angularAccelLimit);
-        omegaLimiter.reset(lastOmega);
-    }
-
-    /**
-     * Resets the acceleration limiters. Call this when enabling the robot
-     * to prevent sudden jumps from stale limiter state.
-     */
-    public void resetAccelerationLimiters() {
-        xLimiter.reset(0);
-        yLimiter.reset(0);
-        omegaLimiter.reset(0);
-    }
-
-    /**
-     * Gets the current translational acceleration limit.
-     * @return The acceleration limit in m/s per second.
-     */
-    public double getAccelerationLimit() {
-        return currentAccelLimit;
-    }
-
-    /**
-     * Gets the current angular acceleration limit.
-     * @return The angular acceleration limit in rad/s per second.
-     */
-    public double getAngularAccelerationLimit() {
-        return currentAngularAccelLimit;
     }
 
     private void initNT() {

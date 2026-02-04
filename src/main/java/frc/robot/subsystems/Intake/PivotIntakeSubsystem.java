@@ -15,15 +15,14 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 // import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.CANBus;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
 public class PivotIntakeSubsystem extends SubsystemBase {
-  private final TalonFX pivotMotor;
+  private final TalonFX pivotMotor = new TalonFX(IntakeConstants.PIVOT_MOTOR_ID, Constants.CAN_BUS);
 
   private final CANdle candle = new CANdle(IntakeConstants.CANDLE_ID);
 
@@ -38,8 +37,7 @@ public class PivotIntakeSubsystem extends SubsystemBase {
   // private boolean previousBottomLimitState = false;
   // private boolean previousTopLimitState = false;
 
-  public PivotIntakeSubsystem(CANBus canBus) {
-    pivotMotor = new TalonFX(IntakeConstants.PIVOT_MOTOR_ID, canBus);
+  public PivotIntakeSubsystem() {
     configCANdle();
     configMotors();
     // configEncoder();

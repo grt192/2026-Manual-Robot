@@ -26,7 +26,7 @@ import frc.robot.util.GRTUtil;
 
 import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_STATOR_CURRENT_LIMIT;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_RAMP_RATE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
 
@@ -139,9 +139,9 @@ public class DriveMotor {
      */
     public void configureMotor(){
 
-        // Set peak current for torque limiting for stall prevention
-        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_PEAK_CURRENT;
-        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = - DRIVE_PEAK_CURRENT;
+        // Set stator current limit for torque limiting for stall prevention
+        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_STATOR_CURRENT_LIMIT;
+        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = -DRIVE_STATOR_CURRENT_LIMIT;
 
         // How fast can the code change torque for the motor
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = DRIVE_RAMP_RATE;

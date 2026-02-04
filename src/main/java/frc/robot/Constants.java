@@ -24,29 +24,54 @@ import edu.wpi.first.math.geometry.Pose2d;
  */
 public final class Constants {
 
-  public static class railgunConstants {
-        
-    //Everything in metric pls
-    public static int upperId = 1;
-    public static int hoodId = 0;
-    //public static int hoodEncoderId = 3;
-    public static int limitId = 3;
-    public static double g = 9.8;
-    public static double tan75 = 3.73205;
-    public static double cos75 = 0.258819;
-    public static double height = 1.83;
-    public static double radius = 0.0508;
-    public static double gearRatioUpper = 1;
-    public static double gearRatioLower = 2;
-    public static double gearRatioHood = 12;
-    public static double upperAngle = 0.45;
-    public static double lowerAngle = 0.14;
-    public static double maxVelo = 1;
-    public static double initHoodAngle = 0.5;
-    public static double hoodMagnetOffset = 0.5;
-    public static Pose2d hubPos= new Pose2d(4.03479, 4.0288, null); //assuming the alliance area is 1st quadrant
-    public static int upperEncoderId = 7;
+  // ==================== SHOOTER CONSTANTS ====================
+
+  public static class FlywheelConstants {
+    // CAN IDs
+    public static final int MOTOR_ID = 1;
+    public static final int ENCODER_ID = 7;
+
+    // Mechanical
+    public static final double GEAR_RATIO = 1.0;
+    public static final double WHEEL_RADIUS_METERS = 0.0508; // 2 inches
+
+    // Current Limits
+    public static final double STATOR_CURRENT_LIMIT = 80.0;
+    public static final double SUPPLY_CURRENT_LIMIT = 40.0;
+
+    // Speed Limits
+    public static final double MAX_VELOCITY_RPS = 100.0;
   }
+
+  public static class HoodConstants {
+    // CAN IDs
+    public static final int MOTOR_ID = 0;
+    public static final int LIMIT_SWITCH_ID = 3;
+
+    // Mechanical
+    public static final double GEAR_RATIO = 12.0;
+
+    // Current Limits
+    public static final double STATOR_CURRENT_LIMIT = 50.0;
+
+    // Position Limits (in rotations)
+    public static final double UPPER_LIMIT = 0.5;  // initHoodAngle
+    public static final double LOWER_LIMIT = 0.14;
+    public static final double HOME_POSITION = 0.5;
+
+    // Speed
+    public static final double MANUAL_SPEED = 0.05;
+  }
+
+  public static class ShooterPhysicsConstants {
+    public static final double GRAVITY = 9.8; // m/s^2
+    public static final double TAN_75 = 3.73205;
+    public static final double COS_75 = 0.258819;
+    public static final double SHOOTER_HEIGHT_METERS = 1.83;
+    public static final Pose2d HUB_POSITION = new Pose2d(4.03479, 4.0288, null);
+  }
+
+  // ==================== SWERVE DRIVE CONSTANTS ====================
 
   public static class SwerveDriveConstants {
 

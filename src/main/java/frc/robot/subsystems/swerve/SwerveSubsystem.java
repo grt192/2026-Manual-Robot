@@ -28,7 +28,7 @@ import static frc.robot.Constants.DebugConstants.*;
 import static frc.robot.Constants.LoggingConstants.*;
 import static frc.robot.Constants.SwerveConstants.*;
 
-import frc.robot.Constants.railgunConstants;
+import frc.robot.Constants.ShooterPhysicsConstants;
 import frc.robot.subsystems.Vision.TimestampedVisionUpdate;
 import frc.robot.util.GRTUtil;
 
@@ -103,8 +103,8 @@ public class SwerveSubsystem extends SubsystemBase {
     public void facePose() {
         Pose2d currentPose = getRobotPosition();
 
-        double dx = railgunConstants.hubPos.getX() - currentPose.getX();
-        double dy = railgunConstants.hubPos.getY() - currentPose.getY();
+        double dx = ShooterPhysicsConstants.HUB_POSITION.getX() - currentPose.getX();
+        double dy = ShooterPhysicsConstants.HUB_POSITION.getY() - currentPose.getY();
 
         Rotation2d targetHeading = new Rotation2d(Math.atan2(dy, dx));
 

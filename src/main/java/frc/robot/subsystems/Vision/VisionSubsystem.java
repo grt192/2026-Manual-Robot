@@ -49,6 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
     private PolynomialRegression yStdDevModel = VisionConstants.yStdDevModel;
     private PolynomialRegression oStdDevModel = VisionConstants.oStdDevModel;
 
+    private boolean connected;
     public VisionSubsystem(CameraConfig cameraConfig) {
         // Initialize the camera with its name
         camera = new PhotonCamera(cameraConfig.getCameraName());
@@ -77,78 +78,78 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        connected = camera.isConnected();
+
         // Get all unread results in the queue from the camera 
         List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-        
         //Loops through all unread results
         for (PhotonPipelineResult result : results){
             
             //checks if the camera detected any apriltags
-            if (result.hasTargets()){
-                
-                double minDistance = Double.MAX_VALUE;
-                long[] tagIDs = new long[result.getTargets().size()];
-                double[] tagDistances = new double[result.getTargets().size()];
-                //loops through all detected targets from the camera
-                for(int i = 0; i < result.getTargets().size(); i++){
-                    PhotonTrackedTarget target = result.getTargets().get(i);
-
-                    Translation3d translation = 
-                        target.getBestCameraToTarget().getTranslation();
-
-                    double distance = Math.sqrt(
-                        Math.pow(translation.getX(),2) +
-                        Math.pow(translation.getY(),2) +
-                        Math.pow(translation.getZ(),2) 
-                    );
-                    if (distance < minDistance){
-                        minDistance = distance;
-                    }
-                    tagIDs[i] = target.getFiducialId();
-                    tagDistances[i] = distance;
-                }
-                tagDistancePublisher.set(tagDistances);
-                tagDistanceLogEntry.append(tagDistances);
-                tagIDLogEntry.append(tagIDs);
-                visionDistPublisher.set(minDistance);
-
-                //Don't use vision measurement if tags are too far
-                if(minDistance > 4) continue;
-                    
-                Optional<EstimatedRobotPose> estimatedPose = 
-                    // photonPoseEstimator.update(result);
-                    photonPoseEstimator.estimateAverageBestTargetsPose(result);
-                // System.out.println("estimatedPoseworked");
-                if(estimatedPose.isPresent()){
-                    Pose2d estimatedPose2d = 
-                        estimatedPose.get().estimatedPose.toPose2d();
-
-                    // double x = estimatedPose2d.getTranslation().getX();
-                    // double y = estimatedPose2d.getTranslation().getY();
-
-                    // if (x - VisionConstants.ROBOT_RADIUS < 0 ||
-                    //     x + VisionConstants.ROBOT_RADIUS > VisionConstants.FIELD_X || 
-                    //     y - VisionConstants.ROBOT_RADIUS < 0 ||
-                    //     y + VisionConstants.ROBOT_RADIUS > VisionConstants.FIELD_Y
-                    // ){
-                    //     continue;
-                    // }
-                        
-                    visionConsumer.accept(
-                        new TimestampedVisionUpdate(
-                            result.getTimestampSeconds(),
-                            estimatedPose2d,
-                            VecBuilder.fill(//standard deviation matrix
-                                xStdDevModel.predict(minDistance),
-                                yStdDevModel.predict(minDistance),
-                                oStdDevModel.predict(minDistance))
-                        )
-                    );
-                    visionPosePublisher.set(estimatedPose2d);
-                    estimatedPoseLogEntry.update(estimatedPose2d);
-                                    }
+            if (!result.hasTargets()){
+                continue;
             }
-        }
+
+            double minDistance = Double.MAX_VALUE;
+            long[] tagIDs = new long[result.getTargets().size()];
+            double[] tagDistances = new double[result.getTargets().size()];
+            //loops through all detected targets from the camera
+            for(int i = 0; i < result.getTargets().size(); i++){
+                PhotonTrackedTarget target = result.getTargets().get(i);
+
+                Translation3d translation = 
+                    target.getBestCameraToTarget().getTranslation();
+
+                double distance = Math.sqrt(
+                    Math.pow(translation.getX(),2) +
+                    Math.pow(translation.getY(),2) +
+                    Math.pow(translation.getZ(),2) 
+                );
+                if (distance < minDistance){
+                    minDistance = distance;
+                }
+                tagIDs[i] = target.getFiducialId();
+                tagDistances[i] = distance;
+            }
+
+            tagDistancePublisher.set(tagDistances);
+            tagDistanceLogEntry.append(tagDistances);
+            tagIDLogEntry.append(tagIDs);
+            visionDistPublisher.set(minDistance);
+
+            //Don't use vision measurement if tags are too far
+            if(minDistance > 4) continue;
+                
+            Optional<EstimatedRobotPose> estimatedPose = photonPoseEstimator.estimateAverageBestTargetsPose(result);
+
+            if(!estimatedPose.isPresent()) continue;
+            Pose2d estimatedPose2d = estimatedPose.get().estimatedPose.toPose2d();
+
+            // double x = estimatedPose2d.getTranslation().getX();
+            // double y = estimatedPose2d.getTranslation().getY();
+            // if (x - VisionConstants.ROBOT_RADIUS < 0 ||
+            //     x + VisionConstants.ROBOT_RADIUS > VisionConstants.FIELD_X || 
+            //     y - VisionConstants.ROBOT_RADIUS < 0 ||
+            //     y + VisionConstants.ROBOT_RADIUS > VisionConstants.FIELD_Y
+            // ){
+            //     continue;
+            // }
+                
+            visionConsumer.accept(
+                new TimestampedVisionUpdate(
+                    result.getTimestampSeconds(),
+                    estimatedPose2d,
+                    VecBuilder.fill(//standard deviation matrix
+                        xStdDevModel.predict(minDistance),
+                        yStdDevModel.predict(minDistance),
+                        oStdDevModel.predict(minDistance))
+                )
+            );
+            visionPosePublisher.set(estimatedPose2d);
+            estimatedPoseLogEntry.update(estimatedPose2d);
+                            }
+        
+        
     }
 
     /**
@@ -165,7 +166,7 @@ public class VisionSubsystem extends SubsystemBase {
     private void initNT(CameraConfig cameraConfig){
         ntInstance = NetworkTableInstance.getDefault();
         visionStatsTable = ntInstance.getTable(
-            "Vision Debug" + cameraConfig.getCameraName()
+            "Vision Debug " + cameraConfig.getCameraName()
         );
         visionPosePublisher = visionStatsTable.getStructTopic(
             "estimated pose", Pose2d.struct
@@ -177,6 +178,7 @@ public class VisionSubsystem extends SubsystemBase {
         cameraPosePublisher = visionStatsTable.getStructTopic(
             "camera pose", Pose3d.struct
         ).publish();
+
         tagDistancePublisher = visionStatsTable.getDoubleArrayTopic(
             "Tag Distances"
         ).publish();
@@ -204,5 +206,8 @@ public class VisionSubsystem extends SubsystemBase {
             cameraConfig.getCameraName() + " Estimated Pose",
             Pose2d.struct
         );
+    }
+    public void snapShot(){
+        camera.takeOutputSnapshot();
     }
 }

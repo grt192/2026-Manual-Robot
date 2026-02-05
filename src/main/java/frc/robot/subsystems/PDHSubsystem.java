@@ -52,6 +52,7 @@ public class PDHSubsystem extends SubsystemBase {
 
     public double getTemperature() {
         return pdh.getTemperature();
+
     }
 
     public double getChannelCurrent(int channel) {

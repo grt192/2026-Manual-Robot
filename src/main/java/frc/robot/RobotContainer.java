@@ -62,19 +62,26 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private PS5DriveController driveController;
-  private CommandPS5Controller mechController;
-  private final CANBus canivore = new CANBus("can");
-
-  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem(canivore);
-
-  private flywheel wheel = new flywheel(canivore);
-  private hood hooded = new hood(canivore);
   private CommandPS5Controller gamer = new CommandPS5Controller(1);
 
+  
+  private final CANBus canivore = new CANBus("can");
+  private final CANBus swerveCan = new CANBus("swerveCan");
+
+  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem(swerveCan);
+
+  //shooter subsystem
+  private flywheel wheel = new flywheel(canivore);
+  private hood hooded = new hood(canivore);
+
+  //intake subsystem
   private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
   private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
+  
+  //hopper subsystem
   private final HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
   private final PDHSubsystem pdhSubsystem = new PDHSubsystem(PDHConstants.PDH_CAN_ID);
+  
   private final Field2d m_field = new Field2d();
 
   // private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
@@ -88,7 +95,6 @@ public class RobotContainer {
     constructMechController();
     configureBindings();
     configureAutoChooser();
-
     CameraServer.startAutomaticCapture(); // start driver cam
     SmartDashboard.putData("Field", m_field);
   }
@@ -110,7 +116,7 @@ public class RobotContainer {
       * swerve aim button is held down, the robot will rotate automatically to always face a target, and only
       * translation will be manually controllable. */
 
-      /* 
+    
     swerveSubsystem.setDefaultCommand(
       new RunCommand(() -> {
         swerveSubsystem.setDrivePowers(
@@ -122,7 +128,21 @@ public class RobotContainer {
         swerveSubsystem
       )
     );
-    */
+    driveController.getRelativeMode().whileTrue(
+      new RunCommand(
+        () -> {
+          swerveSubsystem.setRobotRelativeDrivePowers(
+            driveController.getForwardPower(),
+            driveController.getLeftPower(),
+            driveController.getRotatePower()
+          );
+          driveController.getRotatePower();
+          }, swerveSubsystem)
+    );
+
+
+
+    //shooter mech stuff
     Trigger dpadUp = new Trigger(() -> gamer.getHID().getPOV() == 0);
     Trigger dpadDown = new Trigger(() -> gamer.getHID().getPOV() == 180);
     Trigger dpadNeutral = new Trigger(() -> {
@@ -147,18 +167,7 @@ public class RobotContainer {
    
 
       
-    /*driveController.getRelativeMode().whileTrue(
-      new RunCommand(
-        () -> {
-          swerveSubsystem.setRobotRelativeDrivePowers(
-            driveController.getForwardPower(),
-            driveController.getLeftPower(),
-            driveController.getRotatePower()
-          );
-          driveController.getRotatePower();
-          }, swerveSubsystem)
-    );
-    */
+  
 
 
     /* Pressing the button resets the field axes to the current robot axes. */
@@ -203,7 +212,7 @@ public class RobotContainer {
 
     /* Intake Controls - Hold button to run rollers */
     // R1 - intake in
-    mechController.R1().whileTrue(
+    gamer.R1().whileTrue(
       new RunCommand(
         () -> intakeSubsystem.setDutyCycle(Constants.IntakeConstants.ROLLER_IN_SPEED),
         intakeSubsystem
@@ -216,7 +225,7 @@ public class RobotContainer {
     );
 
     // L1 - intake out
-    mechController.L1().whileTrue(
+    gamer.L1().whileTrue(
       new RunCommand(
         () -> intakeSubsystem.setDutyCycle(Constants.IntakeConstants.ROLLER_OUT_SPEED),
         intakeSubsystem
@@ -230,7 +239,7 @@ public class RobotContainer {
 
      // Pivot Configs: R2 for pivot up and L2 for pivot down
         pivotIntake.setDefaultCommand(
-    new ManualIntakePivotCommand(pivotIntake, () -> mechController.getR2Axis() - mechController.getL2Axis()
+    new ManualIntakePivotCommand(pivotIntake, () -> gamer.getR2Axis() - gamer.getL2Axis()
      )
    );
 
@@ -278,7 +287,6 @@ public class RobotContainer {
    * Constructs mech controller
    */
   private void constructMechController(){
-    mechController = new CommandPS5Controller(1);
   }
 
   /**

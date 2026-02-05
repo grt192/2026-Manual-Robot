@@ -12,6 +12,9 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+
+import static edu.wpi.first.units.Units.NewtonMeters;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.measure.Angle;
@@ -149,6 +152,6 @@ public class flywheel extends SubsystemBase {
 
         // Connection status
         Logger.recordOutput(LOG_PREFIX + "Connected", upperMotor.isConnected());
-        Logger.recordOutput("Torque", upperMotor.getTorqueCurrent().getValueAsDouble() * upperMotor.getMotorKT().getValueAsDouble());
+        Logger.recordOutput("Torque(N*m)", upperMotor.getMotorKT().getValue().timesDivisor(upperMotor.getTorqueCurrent().getValue()).in(NewtonMeters));
     }
 }

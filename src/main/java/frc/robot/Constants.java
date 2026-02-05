@@ -12,6 +12,8 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -20,17 +22,21 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.Vision.CameraConfig;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.util.AlignUtil;
 import frc.robot.util.PolynomialRegression;
 import edu.wpi.first.math.geometry.Pose2d;
 
-
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants
+ * should be declared
  * globally (i.e. public static). Do not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
@@ -346,18 +352,17 @@ public final class Constants {
 
     // All Reef Poses
     public final static List<Pose2d> allReefPoseList = List.of(
-      AlignUtil.getAlignPath(B_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(C_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(D_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(E_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(F_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(G_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(H_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(I_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(J_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(K_alignName).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(L_alignName).getStartingHolonomicPose().get()
-    );
+        AlignUtil.getAlignPath(B_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(C_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(D_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(E_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(F_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(G_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(H_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(I_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(J_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(K_alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(L_alignName).getStartingHolonomicPose().get());
 
     public final static List<String> reefPathList = List.of(
       A_alignName, B_alignName, C_alignName, D_alignName,
@@ -374,8 +379,21 @@ public final class Constants {
       new ChassisSpeeds(-0.25, 0.25, 0)
     );
 
+    public static String LS_1alignName = "LS align 1";
+    public static String LS_2alignName = "LS align 2";
+    public static String LS_3alignName = "LS align 3";
+    public static String RS_1alignName = "RS align 1";
+    public static String RS_2alignName = "RS align 2";
+    public static String RS_3alignName = "RS align 3";
+
     // Source Poses
     public static final List<Pose2d> blueSourcePoses = List.of(
+        // AlignUtil.getAlignPath(LS_1alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(LS_2alignName).getStartingHolonomicPose().get(),
+        // AlignUtil.getAlignPath(LS_3alignName).getStartingHolonomicPose().get(),
+        // AlignUtil.getAlignPath(RS_1alignName).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(RS_2alignName).getStartingHolonomicPose().get()
+    // AlignUtil.getAlignPath(RS_3alignName).getStartingHolonomicPose().get()
       AlignUtil.getAlignPath(LS_2alignName).getStartingHolonomicPose().get(),
       AlignUtil.getAlignPath(RS_2alignName).getStartingHolonomicPose().get()
     );
@@ -393,13 +411,12 @@ public final class Constants {
     );
 
     public static List<Pose2d> blueAlgaeAlignPoses = List.of(
-      AlignUtil.getAlignPath(algae_1).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(algae_2).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(algae_3).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(algae_4).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(algae_5).getStartingHolonomicPose().get(),
-      AlignUtil.getAlignPath(algae_6).getStartingHolonomicPose().get()
-    );
+        AlignUtil.getAlignPath(algae_1).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(algae_2).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(algae_3).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(algae_4).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(algae_5).getStartingHolonomicPose().get(),
+        AlignUtil.getAlignPath(algae_6).getStartingHolonomicPose().get());
 
     public static List<Pose2d> redAlgaeAlignPoses = List.of(
       AlignUtil.getAlignPath(algae_1).flipPath().getStartingHolonomicPose().get(),
@@ -429,5 +446,25 @@ public final class Constants {
     public static final boolean DRIVE_DEBUG = true;
     public static final boolean STEER_DEBUG = true;
     public static final boolean STATE_DEBUG = true;
+  }
+
+  public static final class ClimbConstants {
+    public static final int WINCH_MOTOR_CAN_ID = 1;
+    public static final int ARM_MOTOR_CAN_ID = 0;
+    public static final int CANDI_CAN_ID = 3;
+
+    public static final InvertedValue ARM_MOTOR_INVERTED = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue WINCH_MOTOR_INVERTED = InvertedValue.Clockwise_Positive;
+
+    public static final double ARM_GR = 12.0;
+    public static final double WINCH_GR = 1.0;
+
+    public static final double ARM_MAX_OUTPUT = 0.05;
+    public static final double WINCH_MAX_OUTPUT = 0.1;
+
+    public static final Angle ARM_REVERSE_LIMIT = Rotations.of(0.05);
+    public static final Angle ARM_FORWARD_LIMIT = Rotations.of(0.3);
+    public static final Angle WINCH_REVERSE_LIMIT = Rotations.of(0);
+    public static final Angle WINCH_FORWARD_LIMIT = Rotations.of(3);
   }
 }

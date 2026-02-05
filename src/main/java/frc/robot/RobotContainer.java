@@ -9,6 +9,7 @@ import frc.robot.commands.allign.AlignToHubCommand;
 import frc.robot.commands.allign.RotateToAngleCommand;
 // frc imports
 import frc.robot.controllers.PS5DriveController;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.shooter.flywheel;
 import frc.robot.subsystems.shooter.hood;
 // Subsystems
@@ -48,17 +49,20 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import com.ctre.phoenix6.CANBus;
 
 
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private CANBus canivore = new CANBus("can");
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private PS5DriveController driveController;
@@ -88,6 +92,11 @@ public class RobotContainer {
   //   VisionConstants.cameraConfigs[0]
   // );
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem(canivore);
+
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     // visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
 
@@ -100,12 +109,17 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * Use this method to define your trigger->command mappings. Triggers can be
+   * created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+   * an arbitrary
    * predicate, or via the named f`actories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+   * {@link
+   * CommandXboxController
+   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or
+   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
   private void configureBindings() {
@@ -273,12 +287,38 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> swerveSubsystem.setSteerSpeedLimit(0.25)));
   }
     
+        () -> {
+          swerveSubsystem.resetDriverHeading();
+        },
+        swerveSubsystem);
+
+    // bind semi auto commands
+    var crossTrigger = mechController.cross();
+    var triangleTrigger = mechController.triangle();
+    crossTrigger.onTrue(m_ClimbSubsystem.climbDown(() -> crossTrigger.getAsBoolean()));
+    triangleTrigger.onTrue(m_ClimbSubsystem.climbUp(() -> triangleTrigger.getAsBoolean()));
+
+    // Manual control with d-pad for winch and left stick for arm
+    m_ClimbSubsystem.setDefaultCommand(Commands.run(() -> {
+      var armDutyCycle = mechController.getLeftY();
+      double winchDutyCycle = 0;
+
+      if (mechController.povUp().getAsBoolean()) {
+        winchDutyCycle++;
+      }
+      if (mechController.povDown().getAsBoolean()) {
+        winchDutyCycle--;
+      }
+      m_ClimbSubsystem.setArmDutyCycle(armDutyCycle);
+      m_ClimbSubsystem.setWinchDutyCycle(winchDutyCycle);
+    }, m_ClimbSubsystem));
+  }
 
   /**
    * Constructs the drive controller based on the name of the controller at port
    * 0
    */
-  private void constructDriveController(){
+  private void constructDriveController() {
     driveController = new PS5DriveController();
     driveController.setDeadZone(0.05);
   }

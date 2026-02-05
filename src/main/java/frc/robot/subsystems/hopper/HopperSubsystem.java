@@ -83,6 +83,13 @@ public class HopperSubsystem extends SubsystemBase {
         return krakenMotor.get();
     }
 
+    public boolean detectBalls() {
+        // Ball detection by monitoring the motor current :D 
+        double currentThreshold = 5.0; // TODO: tune this value
+        return krakenMotor.getStatorCurrent().getValueAsDouble() > currentThreshold;
+    }
+    
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Hopper/CurrentRPM", getCurrentRPM());
@@ -91,5 +98,6 @@ public class HopperSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hopper/Current", krakenMotor.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Hopper/Voltage", krakenMotor.getMotorVoltage().getValueAsDouble());
         SmartDashboard.putNumber("Hopper/Temp", krakenMotor.getDeviceTemp().getValueAsDouble());
+        SmartDashboard.putBoolean("Hopper/BallsDetected", detectBalls());
     }
 }

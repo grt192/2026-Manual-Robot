@@ -133,6 +133,7 @@ public final class Constants {
     public static final double ROLLER_CURRENT_LIMIT = 100.;
     public static final double ROLLER_STATOR_CURRENT_LIMIT = 120.;
     public static final double ROLLER_OPEN_LOOP_RAMP = 0.05;
+    public static final double BALL_DETECTION_CURRENT_THRESHOLD = 20.0; // Amps - threshold for detecting a ball in the intake
 
     // Pivot Motor
     public static final int PIVOT_MOTOR_ID = 0;

@@ -63,6 +63,9 @@ public class RollerIntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake/Roller/Voltage", rollerMotor.getMotorVoltage().getValueAsDouble());
         SmartDashboard.putNumber("Intake/Roller/MotorTemp", rollerMotor.getDeviceTemp().getValueAsDouble());
         SmartDashboard.putBoolean("Intake/Roller/IsRunning", Math.abs(rollerMotor.get()) > 0.01);
+
+        // Ball detection based on current draw
+        SmartDashboard.putBoolean("Intake/Ball Detected", hasBall());
     }
 
     /**
@@ -100,5 +103,14 @@ public class RollerIntakeSubsystem extends SubsystemBase {
 
     public boolean isRunning() {
         return Math.abs(rollerMotor.get()) > 0.01;
+    }
+
+    /**
+     * Detects if a ball is in the intake based on motor current draw
+     * @return true if current exceeds threshold while motor is running
+     */
+    public boolean hasBall() {
+        double current = rollerMotor.getStatorCurrent().getValueAsDouble();
+        return isRunning() && current > IntakeConstants.BALL_DETECTION_CURRENT_THRESHOLD;
     }
 }

@@ -24,7 +24,9 @@ import frc.robot.commands.intake.SetIntakePivotCommand;
 import frc.robot.commands.intake.IntakeSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 
@@ -197,14 +199,43 @@ public class RobotContainer {
     // Match time
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
+    // Alliance indicator
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      SmartDashboard.putString("Status/Alliance", alliance.get().toString());
+      SmartDashboard.putBoolean("Status/Is Red Alliance", alliance.get() == DriverStation.Alliance.Red);
+      SmartDashboard.putBoolean("Status/Is Blue Alliance", alliance.get() == DriverStation.Alliance.Blue);
+    } else {
+      SmartDashboard.putString("Status/Alliance", "UNKNOWN");
+      SmartDashboard.putBoolean("Status/Is Red Alliance", false);
+      SmartDashboard.putBoolean("Status/Is Blue Alliance", false);
+    }
+
+    // Robot velocity indicator
+    ChassisSpeeds robotSpeeds = swerveSubsystem.getRobotRelativeChassisSpeeds();
+    double linearVelocity = Math.sqrt(
+      Math.pow(robotSpeeds.vxMetersPerSecond, 2) +
+      Math.pow(robotSpeeds.vyMetersPerSecond, 2)
+    );
+    SmartDashboard.putNumber("Status/Robot Velocity (m/s)", linearVelocity);
+    SmartDashboard.putNumber("Status/Robot Velocity X (m/s)", robotSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("Status/Robot Velocity Y (m/s)", robotSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("Status/Robot Angular Velocity (rad/s)", robotSpeeds.omegaRadiansPerSecond);
+
+    // Battery voltage indicator
+    double batteryVoltage = RobotController.getBatteryVoltage();
+    SmartDashboard.putNumber("Status/Battery Voltage", batteryVoltage);
+    SmartDashboard.putBoolean("Status/Low Battery Warning", batteryVoltage < 11.5);
+
     // Intake
     SmartDashboard.putString("Status/Intake State", getIntakeState());
     SmartDashboard.putNumber("Status/Intake Angle", pivotIntake.getAngleDegrees());
     SmartDashboard.putBoolean("Status/Roller Active", isRollerActive());
+    SmartDashboard.putBoolean("Status/Ball Detected", intakeSubsystem.hasBall());
     SmartDashboard.putBoolean("Status/At Top Limit", pivotIntake.isAtTopLimit());
     SmartDashboard.putBoolean("Status/At Bottom Limit", pivotIntake.isAtBottomLimit());
 
-    // Vision + Autoalign 
+    // Vision + Autoalign
     // VisionSubsystem is commented out rn because it's outdated
     SmartDashboard.putBoolean("Status/Target Detected", hasTarget());
     SmartDashboard.putBoolean("Status/Target Locked", isTargetLocked());

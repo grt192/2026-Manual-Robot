@@ -7,13 +7,12 @@ package frc.robot.subsystems.Intake;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.configs.CANdleConfiguration;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -50,14 +49,18 @@ public class PivotIntakeSubsystem extends SubsystemBase {
     config.Slot0.kD = IntakeConstants.PIVOT_D;
     config.Slot0.kV = IntakeConstants.PIVOT_F;
 
+    config.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.PIVOT_STATOR_CURRENT_LIMIT_ENABLE;
+    config.CurrentLimits.StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_CURRENT_LIMIT;
+
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    // Config current limits
-    config.withCurrentLimits(
-      new CurrentLimitsConfigs()
-          .withStatorCurrentLimit(IntakeConstants.PIVOT_STATOR_CURRENT_LIMIT)
-          .withStatorCurrentLimitEnable(IntakeConstants.PIVOT_STATOR_CURRENT_LIMIT_ENABLE)
-    );
+    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+    config.Feedback.SensorToMechanismRatio = IntakeConstants.GEAR_RATIO;
+
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = IntakeConstants.EXTENDED_POS;
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = IntakeConstants.STOWED_POS;
 
     pivotMotor.getConfigurator().apply(config);
   }
@@ -80,10 +83,10 @@ public class PivotIntakeSubsystem extends SubsystemBase {
     return canCoder.getAbsolutePosition().getValueAsDouble();
   }
 
-  public void setAngle(double angleDegrees) {
-    angleDegrees = Math.max(IntakeConstants.STOWED_POS,
-                           Math.min(IntakeConstants.EXTENDED_POS, angleDegrees));
-    double motorRotations = (angleDegrees / 360.0) / IntakeConstants.GEAR_RATIO;
+  public void setAngle(double angleRotations) {
+    angleRotations = Math.max(IntakeConstants.STOWED_POS,
+                           Math.min(IntakeConstants.EXTENDED_POS, angleRotations));
+    double motorRotations = angleRotations / IntakeConstants.GEAR_RATIO;
     pivotMotor.setControl(positionControl.withPosition(motorRotations));
   }
 

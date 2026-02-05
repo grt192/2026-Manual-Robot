@@ -63,8 +63,9 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private PS5DriveController driveController;
   private CommandPS5Controller mechController;
-  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final CANBus canivore = new CANBus("can");
+
+  private SwerveSubsystem swerveSubsystem = new SwerveSubsystem(canivore);
 
   private flywheel wheel = new flywheel(canivore);
   private hood hooded = new hood(canivore);

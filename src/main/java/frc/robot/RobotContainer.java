@@ -9,8 +9,8 @@ import frc.robot.commands.allign.AlignToHubCommand;
 import frc.robot.commands.allign.RotateToAngleCommand;
 // frc imports
 import frc.robot.controllers.PS5DriveController;
-
-
+import frc.robot.subsystems.shooter.flywheel;
+import frc.robot.subsystems.shooter.hood;
 // Subsystems
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 // import frc.robot.subsystems.Vision.VisionSubsystem;
@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import com.ctre.phoenix6.CANBus;
 
 
 
@@ -63,8 +64,12 @@ public class RobotContainer {
   private PS5DriveController driveController;
   private CommandPS5Controller mechController;
   private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
   private final CANBus canivore = new CANBus("can");
+
+  private flywheel wheel = new flywheel(canivore);
+  private hood hooded = new hood(canivore);
+  private CommandPS5Controller gamer = new CommandPS5Controller(1);
+
   private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
   private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
   private final HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
@@ -97,10 +102,14 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+      //gun.run();
       /* Driving -- One joystick controls translation, the other rotation. If the robot-relative button is held down,
       * the robot is controlled along its own axes, otherwise controls apply to the field axes by default. If the
       * swerve aim button is held down, the robot will rotate automatically to always face a target, and only
       * translation will be manually controllable. */
+
+      /* 
     swerveSubsystem.setDefaultCommand(
       new RunCommand(() -> {
         swerveSubsystem.setDrivePowers(
@@ -112,8 +121,32 @@ public class RobotContainer {
         swerveSubsystem
       )
     );
+    */
+    Trigger dpadUp = new Trigger(() -> gamer.getHID().getPOV() == 0);
+    Trigger dpadDown = new Trigger(() -> gamer.getHID().getPOV() == 180);
+    Trigger dpadNeutral = new Trigger(() -> {
+      int pov = gamer.getHID().getPOV();
+      return pov != 0 && pov != 180;
+    });
+  
+    
+    wheel.setDefaultCommand(
+      new RunCommand(
+          () -> {
+            double r2 = gamer.getR2Axis();
+            wheel.flySpeed((r2+1)/2);
+          },
+          wheel));
+    
+
+    dpadUp.whileTrue(new RunCommand(() -> hooded.hoodSpeed(0.05), hooded));
+    dpadDown.whileTrue(new RunCommand(() -> hooded.hoodSpeed(-0.05), hooded));
+    dpadNeutral.onTrue(new RunCommand(() -> hooded.hoodSpeed(0.0), hooded));
+          
+   
+
       
-    driveController.getRelativeMode().whileTrue(
+    /*driveController.getRelativeMode().whileTrue(
       new RunCommand(
         () -> {
           swerveSubsystem.setRobotRelativeDrivePowers(
@@ -124,9 +157,11 @@ public class RobotContainer {
           driveController.getRotatePower();
           }, swerveSubsystem)
     );
+    */
 
 
     /* Pressing the button resets the field axes to the current robot axes. */
+    /* 
     driveController.bindDriverHeadingReset(
       () ->{
         swerveSubsystem.resetDriverHeading();
@@ -227,6 +262,7 @@ public class RobotContainer {
     new Trigger(() -> driveController.getPOV() == 270)
         .onTrue(Commands.runOnce(() -> swerveSubsystem.setSteerSpeedLimit(0.25)));
   }
+    
 
   /**
    * Constructs the drive controller based on the name of the controller at port

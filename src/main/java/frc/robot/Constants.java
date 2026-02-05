@@ -22,6 +22,8 @@ import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.Vision.CameraConfig;
 import frc.robot.util.AlignUtil;
 import frc.robot.util.PolynomialRegression;
+import edu.wpi.first.math.geometry.Pose2d;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -36,6 +38,56 @@ public final class Constants {
   public static final String CAN_BUS = "can";
 
   // ==================== SWERVE DRIVE ====================
+
+
+  // ==================== SHOOTER CONSTANTS ====================
+
+  public static class FlywheelConstants {
+    // CAN IDs
+    public static final int MOTOR_ID = 1;
+    public static final int ENCODER_ID = 7;
+
+    // Mechanical
+    public static final double GEAR_RATIO = 1.0;
+    public static final double WHEEL_RADIUS_METERS = 0.0508; // 2 inches
+
+    // Current Limits
+    public static final double STATOR_CURRENT_LIMIT = 80.0;
+    public static final double SUPPLY_CURRENT_LIMIT = 40.0;
+
+    // Speed Limits
+    public static final double MAX_VELOCITY_RPS = 100.0;
+  }
+
+  public static class HoodConstants {
+    // CAN IDs
+    public static final int MOTOR_ID = 0;
+    public static final int LIMIT_SWITCH_ID = 3;
+
+    // Mechanical
+    public static final double GEAR_RATIO = 12.0;
+
+    // Current Limits
+    public static final double STATOR_CURRENT_LIMIT = 50.0;
+
+    // Position Limits (in rotations)
+    public static final double UPPER_LIMIT = 0.5;  // initHoodAngle
+    public static final double LOWER_LIMIT = 0.14;
+    public static final double HOME_POSITION = 0.5;
+
+    // Speed
+    public static final double MANUAL_SPEED = 0.05;
+  }
+
+  public static class ShooterPhysicsConstants {
+    public static final double GRAVITY = 9.8; // m/s^2
+    public static final double TAN_75 = 3.73205;
+    public static final double COS_75 = 0.258819;
+    public static final double SHOOTER_HEIGHT_METERS = 1.83;
+    public static final Pose2d HUB_POSITION = new Pose2d(4.03479, 4.0288, null);
+  }
+
+  // ==================== SWERVE DRIVE CONSTANTS ====================
 
   public static class SwerveDriveConstants {
     // Motor Constants

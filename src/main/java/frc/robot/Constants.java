@@ -132,7 +132,7 @@ public final class Constants {
 
   public static class IntakeConstants {
     // Roller Motor
-    public static final int ROLLER_CAN_ID = 14;
+    public static final int ROLLER_CAN_ID = 1;
     public static final double ROLLER_IN_SPEED = 0.5;
     public static final double ROLLER_OUT_SPEED = -0.5;
     public static final double ROLLER_CURRENT_LIMIT = 100.0;
@@ -141,7 +141,7 @@ public final class Constants {
     public static final InvertedValue ROLLER_INVERTED = InvertedValue.CounterClockwise_Positive;
 
     // Pivot Motor
-    public static final int PIVOT_MOTOR_ID = 12;
+    public static final int PIVOT_MOTOR_ID = 0;
     public static final double MANUAL_PIVOT_SPEED = 0.15;
     public static final double PIVOT_STATOR_CURRENT_LIMIT = 40.0;
     public static final boolean PIVOT_STATOR_CURRENT_LIMIT_ENABLE = true;
@@ -157,7 +157,7 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final int KRAKEN_CAN_ID = 15;
+    public static final int KRAKEN_CAN_ID = 14;
 
     // Current Limits
     public static final int SUPPLY_CURRENT_LIMIT = 80;

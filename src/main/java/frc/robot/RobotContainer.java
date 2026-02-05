@@ -24,6 +24,7 @@ import frc.robot.Constants.PDHConstants;
 
 // Commands
 import frc.robot.commands.intake.ManualIntakePivotCommand;
+import frc.robot.commands.intake.ManualIntakePivotCommand;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -138,13 +139,82 @@ public class RobotContainer {
         Math.abs(driveController.getForwardPower()) > 0 ||
         Math.abs(driveController.getLeftPower()) > 0 ||
         Math.abs(driveController.getRotatePower()) > 0;
+    // --- Intake pivot set-position controls (commented out for now) ---
+    // mechController.square().onTrue(
+    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.STOWED_POS)
+    // );
+    // mechController.cross().onTrue(
+    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.EXTENDED_POS)
+    // );
 
-    // Triangle = rotate to 0°, Circle = rotate to 90°
-    driveController.triangle().onTrue(new RotateToAngleCommand(swerveSubsystem, 0, driverInput));
-    driveController.circle().onTrue(new RotateToAngleCommand(swerveSubsystem, 90, driverInput));
+  // circle for the manual hopper
+    mechController.square().whileTrue(
+      new RunCommand(
+        () -> HopperSubsystem.setManualControl(1.0),
+        HopperSubsystem
+      )
+    ).onFalse(
+      new InstantCommand(
+        () -> HopperSubsystem.stop(),
+        HopperSubsystem
+      )
+    );
 
-    // L1 = align to hub
-    new Trigger(driveController::getLeftBumper).onTrue(AlignToHubCommand.create(swerveSubsystem, driverInput));
+    // --- Hopper RPM control (commented out for now) ---
+    // mechController.triangle().onTrue(
+    //   new HopperSetRPMCommand(HopperSubsystem)
+    // );
+
+    /* Intake Controls - Hold button to run rollers */
+    // R1 - intake in
+    mechController.R1().whileTrue(
+      new RunCommand(
+        () -> intakeSubsystem.setDutyCycle(Constants.IntakeConstants.ROLLER_IN_SPEED),
+        intakeSubsystem
+      )
+    ).onFalse(
+      new InstantCommand(
+        () -> intakeSubsystem.stop(),
+        intakeSubsystem
+      )
+    );
+
+    // L1 - intake out
+    mechController.L1().whileTrue(
+      new RunCommand(
+        () -> intakeSubsystem.setDutyCycle(Constants.IntakeConstants.ROLLER_OUT_SPEED),
+        intakeSubsystem
+      )
+    ).onFalse(
+      new InstantCommand(
+        () -> intakeSubsystem.stop(),
+        intakeSubsystem
+      )
+    );
+
+     // Pivot Configs: R2 for pivot up and L2 for pivot down
+        pivotIntake.setDefaultCommand(
+    new ManualIntakePivotCommand(pivotIntake, () -> mechController.getR2Axis() - mechController.getL2Axis()
+     )
+   );
+
+    // Triangle - reset pivot encoder position to 0
+  //  mechController.triangle().onTrue(
+    //  new InstantCommand(() -> pivotIntake.resetPosition(), pivotIntake)
+    //);
+
+
+
+  }
+
+
+  public void updateDashboard() {
+    // Robot position
+    Pose2d robotPose = swerveSubsystem.getRobotPosition();
+    m_field.setRobotPose(robotPose);
+
+    // Match time
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
     // D-pad steer speed limiting (scales MotionMagic cruise velocity)
     // Up = 100%, Right = 75%, Down = 50%, Left = 25%

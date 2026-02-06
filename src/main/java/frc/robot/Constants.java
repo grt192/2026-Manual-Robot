@@ -443,14 +443,14 @@ public final class Constants {
   }
 
   public static final class ClimbConstants {
-    public static final int WINCH_MOTOR_CAN_ID = 1;
-    public static final int ARM_MOTOR_CAN_ID = 0;
-    public static final int CANDI_CAN_ID = 3;
+    public static final int WINCH_MOTOR_CAN_ID = 21;
+    public static final int ARM_MOTOR_CAN_ID = 19;
+    public static final int CANDI_CAN_ID = 22; // might be 23
 
     public static final InvertedValue ARM_MOTOR_INVERTED = InvertedValue.CounterClockwise_Positive;
     public static final InvertedValue WINCH_MOTOR_INVERTED = InvertedValue.Clockwise_Positive;
 
-    public static final double ARM_GR = 12.0;
+    public static final double ARM_GR = 1.0;
     public static final double WINCH_GR = 1.0;
 
     public static final double ARM_MAX_OUTPUT = 0.05;

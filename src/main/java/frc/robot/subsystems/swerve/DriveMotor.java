@@ -22,9 +22,12 @@ import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.util.GRTUtil;
+
 import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
-import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
+import static frc.robot.Constants.SwerveDriveConstants.DRIVE_STATOR_CURRENT_LIMIT;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_RAMP_RATE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE;
 
@@ -32,9 +35,10 @@ import static frc.robot.Constants.SwerveDriveConstants.DRIVE_WHEEL_CIRCUMFERENCE
 
 public class DriveMotor {
 
-
+    
     // Motor instance for controlling the drive motor
     private TalonFX motor;
+    private int motorID;
 
     // Configuration for Kraken stored in one Object
     private final TalonFXConfiguration motorConfig = new TalonFXConfiguration();
@@ -72,6 +76,7 @@ public class DriveMotor {
     private DoubleLogEntry torqueCurrLogEntry;
     private DoubleLogEntry temperatureLogEntry;
     public DriveMotor(int motorID, CANBus canivore){
+        this.motorID = motorID;
 
         // Set Motor and reset Encoder
         motor = new TalonFX(motorID, canivore);
@@ -81,7 +86,7 @@ public class DriveMotor {
         configureMotor();
         initNT(motorID);
         initSignals();
-        // initLogs(motorID);
+        initLogs(motorID);
     }
 
     /**
@@ -121,25 +126,25 @@ public class DriveMotor {
      * Initializes log entries
      * @param canId drive motor's CAN ID
      */
-    // private void initLogs(int canId){
-    //     positionLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "position");
-    //     veloErrorLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "veloError"); 
-    //     veloLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "velo");
-    //     targetVeloEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "targetVelo");
-    //     appliedVoltsLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "appliedVolts");
-    //     supplyCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "supplyCurrent");
-    //     torqueCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "torqueCurrent");
-    //     temperatureLogEntry = new DoubleLogEntry(DataLogManager.getLog(), canId + "temperature");
-    // }
+    private void initLogs(int canId){
+        positionLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/position");
+        veloErrorLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/veloError");
+        veloLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/velo");
+        targetVeloEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/targetVelo");
+        appliedVoltsLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/appliedVolts");
+        supplyCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/supplyCurrent");
+        torqueCurrLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/torqueCurrent");
+        temperatureLogEntry = new DoubleLogEntry(DataLogManager.getLog(), "drive/" + canId + "/temperature");
+    }
 
     /**
      * Set Configurations for Kraken drive
      */
     public void configureMotor(){
 
-        // Set peak current for torque limiting for stall prevention
-        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_PEAK_CURRENT;
-        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = - DRIVE_PEAK_CURRENT;
+        // Set stator current limit for torque limiting for stall prevention
+        motorConfig.TorqueCurrent.PeakForwardTorqueCurrent = DRIVE_STATOR_CURRENT_LIMIT;
+        motorConfig.TorqueCurrent.PeakReverseTorqueCurrent = -DRIVE_STATOR_CURRENT_LIMIT;
 
         // How fast can the code change torque for the motor
         motorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = DRIVE_RAMP_RATE;
@@ -292,18 +297,40 @@ public class DriveMotor {
     }
 
     /**
-     * Logs drive motor statistics to data log
+     * Logs drive motor statistics to data log and SmartDashboard
      */
-    // public void logStats() {
-    //     positionLogEntry.append(getDistance(), GRTUtil.getFPGATime());
-    //     targetVeloEntry.append(targetRotationsPerSec, GRTUtil.getFPGATime());
-    //     veloErrorLogEntry.append(0.0, GRTUtil.getFPGATime()); // TODO: Calculate actual velocity error
-    //     veloLogEntry.append(getVelocity(), GRTUtil.getFPGATime());
-    //     appliedVoltsLogEntry.append(appliedVoltsSignal.getValueAsDouble(), GRTUtil.getFPGATime());
-    //     supplyCurrLogEntry.append(supplyCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
-    //     torqueCurrLogEntry.append(torqueCurrentSignal.getValueAsDouble(), GRTUtil.getFPGATime());
-    //     temperatureLogEntry.append(getTemperature(), GRTUtil.getFPGATime());
-    // }
+    public void logStats() {
+        long ts = GRTUtil.getFPGATime();
+
+        double position = getDistance();
+        double velocity = getVelocity();
+        double veloError = targetRotationsPerSec - motor.getVelocity().getValueAsDouble();
+        double appliedVolts = appliedVoltsSignal.getValueAsDouble();
+        double supplyCurrent = supplyCurrentSignal.getValueAsDouble();
+        double torqueCurrent = torqueCurrentSignal.getValueAsDouble();
+        double temperature = getTemperature();
+
+        // DataLog
+        positionLogEntry.append(position, ts);
+        targetVeloEntry.append(targetRotationsPerSec, ts);
+        veloErrorLogEntry.append(veloError, ts);
+        veloLogEntry.append(velocity, ts);
+        appliedVoltsLogEntry.append(appliedVolts, ts);
+        supplyCurrLogEntry.append(supplyCurrent, ts);
+        torqueCurrLogEntry.append(torqueCurrent, ts);
+        temperatureLogEntry.append(temperature, ts);
+
+        // SmartDashboard
+        String prefix = "Drive/" + motorID + "/";
+        SmartDashboard.putNumber(prefix + "Position", position);
+        SmartDashboard.putNumber(prefix + "Velocity", velocity);
+        SmartDashboard.putNumber(prefix + "TargetRPS", targetRotationsPerSec);
+        SmartDashboard.putNumber(prefix + "VeloError", veloError);
+        SmartDashboard.putNumber(prefix + "AppliedVolts", appliedVolts);
+        SmartDashboard.putNumber(prefix + "SupplyCurrent", supplyCurrent);
+        SmartDashboard.putNumber(prefix + "TorqueCurrent", torqueCurrent);
+        SmartDashboard.putNumber(prefix + "Temperature", temperature);
+    }
 
     
 

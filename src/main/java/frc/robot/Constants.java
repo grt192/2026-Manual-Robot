@@ -379,12 +379,6 @@ public final class Constants {
       new ChassisSpeeds(-0.25, 0.25, 0)
     );
 
-    public static String LS_1alignName = "LS align 1";
-    public static String LS_2alignName = "LS align 2";
-    public static String LS_3alignName = "LS align 3";
-    public static String RS_1alignName = "RS align 1";
-    public static String RS_2alignName = "RS align 2";
-    public static String RS_3alignName = "RS align 3";
 
     // Source Poses
     public static final List<Pose2d> blueSourcePoses = List.of(
@@ -392,7 +386,7 @@ public final class Constants {
         AlignUtil.getAlignPath(LS_2alignName).getStartingHolonomicPose().get(),
         // AlignUtil.getAlignPath(LS_3alignName).getStartingHolonomicPose().get(),
         // AlignUtil.getAlignPath(RS_1alignName).getStartingHolonomicPose().get(),
-        AlignUtil.getAlignPath(RS_2alignName).getStartingHolonomicPose().get()
+        AlignUtil.getAlignPath(RS_2alignName).getStartingHolonomicPose().get(),
     // AlignUtil.getAlignPath(RS_3alignName).getStartingHolonomicPose().get()
       AlignUtil.getAlignPath(LS_2alignName).getStartingHolonomicPose().get(),
       AlignUtil.getAlignPath(RS_2alignName).getStartingHolonomicPose().get()

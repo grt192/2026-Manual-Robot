@@ -38,14 +38,6 @@ public class Robot extends LoggedRobot {
 
   private static final MODE currentMODE = RobotBase.isReal() ? MODE.REAL : MODE.SIM;
 
-  public enum MODE {
-    REAL,
-    SIM,
-    REPLAY
-  }
-
-  private static final MODE currentMODE = RobotBase.isReal() ? MODE.REAL : MODE.SIM;
-
   /**
    * This function is run when the robot is first started up and should be used
    * for any

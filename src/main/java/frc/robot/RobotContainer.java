@@ -62,7 +62,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  private CANBus canivore = new CANBus("can");
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private PS5DriveController driveController;
@@ -262,9 +261,28 @@ public class RobotContainer {
     //  new InstantCommand(() -> pivotIntake.resetPosition(), pivotIntake)
     //);
 
+    // bind semi auto commands
+    var crossTrigger = gamer.cross();
+    var triangleTrigger = gamer.triangle();
+    crossTrigger.onTrue(m_ClimbSubsystem.climbDown(() -> crossTrigger.getAsBoolean()));
+    triangleTrigger.onTrue(m_ClimbSubsystem.climbUp(() -> triangleTrigger.getAsBoolean()));
 
+    // Manual control with d-pad for winch and left stick for arm
+    m_ClimbSubsystem.setDefaultCommand(Commands.run(() -> {
+      var armDutyCycle = gamer.getLeftY();
+      double winchDutyCycle = 0;
 
+      if (gamer.povUp().getAsBoolean()) {
+        winchDutyCycle++;
+      }
+      if (gamer.povDown().getAsBoolean()) {
+        winchDutyCycle--;
+      }
+      m_ClimbSubsystem.setArmDutyCycle(armDutyCycle);
+      m_ClimbSubsystem.setWinchDutyCycle(winchDutyCycle);
+    }, m_ClimbSubsystem));
   }
+
 
 
   public void updateDashboard() {
@@ -287,32 +305,8 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> swerveSubsystem.setSteerSpeedLimit(0.25)));
   }
     
-        () -> {
-          swerveSubsystem.resetDriverHeading();
-        },
-        swerveSubsystem);
+        
 
-    // bind semi auto commands
-    var crossTrigger = mechController.cross();
-    var triangleTrigger = mechController.triangle();
-    crossTrigger.onTrue(m_ClimbSubsystem.climbDown(() -> crossTrigger.getAsBoolean()));
-    triangleTrigger.onTrue(m_ClimbSubsystem.climbUp(() -> triangleTrigger.getAsBoolean()));
-
-    // Manual control with d-pad for winch and left stick for arm
-    m_ClimbSubsystem.setDefaultCommand(Commands.run(() -> {
-      var armDutyCycle = mechController.getLeftY();
-      double winchDutyCycle = 0;
-
-      if (mechController.povUp().getAsBoolean()) {
-        winchDutyCycle++;
-      }
-      if (mechController.povDown().getAsBoolean()) {
-        winchDutyCycle--;
-      }
-      m_ClimbSubsystem.setArmDutyCycle(armDutyCycle);
-      m_ClimbSubsystem.setWinchDutyCycle(winchDutyCycle);
-    }, m_ClimbSubsystem));
-  }
 
   /**
    * Constructs the drive controller based on the name of the controller at port

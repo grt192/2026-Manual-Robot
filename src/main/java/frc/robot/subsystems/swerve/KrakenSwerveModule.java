@@ -23,7 +23,7 @@ import static frc.robot.Constants.SwerveConstants.STEER_P;
 public class KrakenSwerveModule {
 
     private final DriveMotor driveMotor;
-    private final SteerMotor2 steerMotor;
+    private final SteerMotor steerMotor;
 
     private int drivePort;
     private int steerPort;
@@ -55,7 +55,7 @@ public class KrakenSwerveModule {
         //     STEER_D[steerIndex],
         //     STEER_FF[steerIndex]
         // );
-        steerMotor = new SteerMotor2(steerPort, canCoderPort, canivore);
+        steerMotor = new SteerMotor(steerPort, canCoderPort, canivore);
         steerMotor.configPID(
             STEER_P[steerIndex],
             STEER_I[steerIndex],
@@ -209,6 +209,18 @@ public class KrakenSwerveModule {
     }
 
     /**
+     * Sets the steer motor cruise velocity for MotionMagic.
+     * @param velocity cruise velocity in rotations per second
+     */
+    public void setSteerCruiseVelocity(double velocity) {
+        steerMotor.setCruiseVelocity(velocity);
+    }
+
+    public double getSteerVelocityRPM() {
+        return steerMotor.getVelocityRPM();
+    }
+
+    /**
      * Publishes steer motor statistics to NetworkTables
      */
     public void publishSteerStats() {
@@ -216,16 +228,10 @@ public class KrakenSwerveModule {
     }
 
     /**
-     * Logs drive motor statistics to data log
+     * Logs all motor statistics to data log
      */
-    // public void logDriveStats() {
-    //     driveMotor.logStats();
-    // }
-
-    /**
-     * Logs steer motor statistics to data log
-     */
-    // public void logSteerStats() {
-    //     steerMotor.logStats();
-    // }
+    public void logStats() {
+        driveMotor.logStats();
+        steerMotor.logStats();
+    }
 }

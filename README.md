@@ -31,8 +31,8 @@
 | ---------------------- | ---------------------------------------- | -------- |
 | X (Cross)              | Forced Pivot In (HOLD)                   |          |
 | O (Circle)             | Pivot In / Out (Click for IN/OUT)        |          |
-| △ (Triangle)           | Shooter Hood Positions (Multiple Clicks) |          |
-| □ (Square)             | Shooter Wheel (Click for ON/OFF)         |          |
+| △ (Triangle)           | Shooter Hood Up                          |          |
+| □ (Square)             | Shooter Hood Down                        |          |
 | L1                     | Hopper Shoot All Balls (HOLD)            |          |
 | L2                     | Intake Rollers In Manual                 |          |
 | R1                     | Hopper Reverse (Agitator) (HOLD)         |          |
@@ -47,7 +47,7 @@
 | Create Button          |                                          |          |
 | PS Button              |                                          |          |
 | Touchpad               |                                          |          |
-| Left Joystick          | Hood Up / Down Manual                    |          |
+| Left Joystick          | FlyWheel Speed                           |          |
 | Right Joystick         | Intake Pivot Up / Down Manual            |          |
 
 ## **CAN Assignments**

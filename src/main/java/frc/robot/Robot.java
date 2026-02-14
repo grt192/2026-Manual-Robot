@@ -4,31 +4,88 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
+import org.littletonrobotics.junction.LoggedRobot;
+
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+
+  private final Timer disabledTimer = new Timer();
+  private final Alert lowBatteryAlert =
+      new Alert(
+          "Battery voltage is very low, turn off the robot or replace the battery to avoid damage.",
+          AlertType.kWarning);
+  private final double lowVoltageCutoff = 11.0;
+  private final double lowVoltageTime = 2.0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
+    CommandScheduler.getInstance().onCommandInitialize(
+        (Command command) -> {
+            System.out.println("[INIT] " + command.getName());
+        });
+
+    CommandScheduler.getInstance().onCommandFinish(
+        (Command command) -> {
+            System.out.println("[FINISH] " + command.getName());
+        });
+
+    CommandScheduler.getInstance().onCommandInterrupt(
+        (Command command) -> {
+            System.out.println("[INTERRUPT] " + command.getName());
+        });
+
+    // Map<String, Integer> commandCounts = new HashMap<>();
+    //   BiConsumer<Command, Boolean> logCommandFunction =
+    //       (Command command, Boolean active) -> {
+    //         String name = command.getName();
+    //         int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+    //         commandCounts.put(name, count);
+    //         Logger.recordOutput(
+    //             "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+    //         Logger.recordOutput("CommandsAll/" + name, count > 0);
+    //       };
+    //   CommandScheduler.getInstance()
+    //       .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
+    //   CommandScheduler.getInstance()
+    //       .onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
+    //   CommandScheduler.getInstance()
+    //       .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
+    Logger.start();
+    // Reset alert timers
+    disabledTimer.restart();
+
+    //silence joystick messages
+    DriverStation.silenceJoystickConnectionWarning(true);
+
     // Start logging to .wpilog file (saved to USB stick or /home/lvuser/logs/)
     DataLogManager.start();
     // Also log DS data (joystick inputs, mode changes, etc.)
     DriverStation.startDataLog(DataLogManager.getLog());
+
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -44,6 +101,18 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    //battery voltage low alert
+    if (DriverStation.isEnabled()) {//alert doesn't trigger during match load
+      disabledTimer.reset();
+    }
+    if (RobotController.getBatteryVoltage() > 0.0
+        && RobotController.getBatteryVoltage() <= 11
+        && disabledTimer.hasElapsed(lowVoltageTime)){
+      lowBatteryAlert.set(true);
+    }
+
+
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic

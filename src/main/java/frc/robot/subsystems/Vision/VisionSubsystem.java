@@ -26,7 +26,7 @@ import edu.wpi.first.util.datalog.StructLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.util.PolynomialRegression;
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera;
@@ -165,26 +165,12 @@ public class VisionSubsystem extends SubsystemBase {
      */
     private void initNT(CameraConfig cameraConfig){
         ntInstance = NetworkTableInstance.getDefault();
-        visionStatsTable = ntInstance.getTable(
-            "Vision Debug " + cameraConfig.getCameraName()
-        );
-        visionPosePublisher = visionStatsTable.getStructTopic(
-            "estimated pose", Pose2d.struct
-        ).publish();
-
-        visionDistPublisher = visionStatsTable.getDoubleTopic(
-            "dist"
-        ).publish();
-        cameraPosePublisher = visionStatsTable.getStructTopic(
-            "camera pose", Pose3d.struct
-        ).publish();
-
-        tagDistancePublisher = visionStatsTable.getDoubleArrayTopic(
-            "Tag Distances"
-        ).publish();
-        cameraPosePublisher.set(
-            new Pose3d().transformBy(cameraConfig.getCameraPose())
-        );
+        visionStatsTable = ntInstance.getTable("Vision Debug " + cameraConfig.getCameraName());
+        visionPosePublisher = visionStatsTable.getStructTopic("estimated pose", Pose2d.struct).publish();
+        visionDistPublisher = visionStatsTable.getDoubleTopic("dist").publish();
+        cameraPosePublisher = visionStatsTable.getStructTopic("camera pose", Pose3d.struct).publish();
+        tagDistancePublisher = visionStatsTable.getDoubleArrayTopic("Tag Distances").publish();
+        cameraPosePublisher.set(new Pose3d().transformBy(cameraConfig.getCameraPose()));
     }
 
     /**

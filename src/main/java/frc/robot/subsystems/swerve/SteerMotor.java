@@ -2,13 +2,16 @@ package frc.robot.subsystems.swerve;
 
 //Constants Import 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -52,7 +55,7 @@ public class SteerMotor {
     private final  CANcoderConfiguration cancoderconfig = new CANcoderConfiguration();
 
     // For fine control of velocity and torque using FOC (Field-Oriented Control)
-    private PositionTorqueCurrentFOC positionRequest = new PositionTorqueCurrentFOC(0)
+    private PositionVoltage positionRequest = new PositionVoltage(0)
                 .withSlot(0)
                 .withFeedForward(0)
                 .withUpdateFreqHz(100.0);
@@ -93,10 +96,10 @@ public class SteerMotor {
     private StatusSignal<Current> torqueCurrentSignal;
 
 
-    public SteerMotor(int motorCAN, int encoderCAN) {
+    public SteerMotor(int motorCAN, int encoderCAN, CANBus canivore) {
         // Set motor and encoder
-        motor = new TalonFX(motorCAN, "can");
-        cancoder = new CANcoder(encoderCAN, "can");
+        motor = new TalonFX(motorCAN, canivore);
+        cancoder = new CANcoder(encoderCAN, canivore);
         gurtMotorCanID = motorCAN;
         // Configure CANcoder and Kraken
         configureCancoder(); // called to ensure settings are applied programmatically

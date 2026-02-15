@@ -2,11 +2,12 @@ package frc.robot.subsystems.swerve;
 
 //Constants Import 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -17,6 +18,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import static frc.robot.Constants.LoggingConstants.SWERVE_TABLE;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_GEAR_REDUCTION;
 import static frc.robot.Constants.SwerveDriveConstants.DRIVE_PEAK_CURRENT;
@@ -58,10 +63,18 @@ public class DriveMotor {
     private StatusSignal<Current> supplyCurrentSignal;
     private StatusSignal<Current> torqueCurrentSignal; //torqueCurrent is Pro
 
-    public DriveMotor(int motorID){
+    private DoubleLogEntry positionLogEntry;
+    private DoubleLogEntry veloErrorLogEntry;
+    private DoubleLogEntry veloLogEntry;
+    private DoubleLogEntry targetVeloEntry;
+    private DoubleLogEntry appliedVoltsLogEntry;
+    private DoubleLogEntry supplyCurrLogEntry;
+    private DoubleLogEntry torqueCurrLogEntry;
+    private DoubleLogEntry temperatureLogEntry;
+    public DriveMotor(int motorID, CANBus canivore){
 
         // Set Motor and reset Encoder
-        motor = new TalonFX(motorID, "can");
+        motor = new TalonFX(motorID, canivore);
         motor.setPosition(0);
 
         // Configure CANcoder and Kraken

@@ -4,12 +4,15 @@
 
 package frc.robot;
 
+import frc.robot.Constants.VisionConstants;
 // frc imports
 import frc.robot.controllers.PS5DriveController;
 
 
 // Subsystems
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.Vision.VisionSubsystem;
+import frc.robot.subsystems.Vision.CameraConfig;
 import frc.robot.subsystems.Intake.RollerIntakeSubsystem;
 import frc.robot.subsystems.Intake.PivotIntakeSubsystem;
 import frc.robot.subsystems.hopper.HopperSubsystem;
@@ -51,23 +54,24 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();  
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private PS5DriveController driveController;
   private CommandPS5Controller mechController;
   private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-  private PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
-  private CANBus canivore = new CANBus("can");
-  private HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
-  private RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
 
-
+  private final CANBus canivore = new CANBus("can");
+  private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem(canivore);
+  private final PivotIntakeSubsystem pivotIntake = new PivotIntakeSubsystem();
+  private final HopperSubsystem HopperSubsystem = new HopperSubsystem(canivore);
   private final Field2d m_field = new Field2d();
 
-
-
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
+    VisionConstants.cameraConfigs[0]
+  );
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
+
     constructDriveController();
     constructMechController();
     configureBindings();
@@ -328,3 +332,4 @@ public class RobotContainer {
   }
 
 }
+ 

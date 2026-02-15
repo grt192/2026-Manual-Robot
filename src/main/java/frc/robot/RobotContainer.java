@@ -23,8 +23,8 @@ import frc.robot.commands.intake.ManualIntakePivotCommand;
 
 import com.ctre.phoenix6.CANBus;
 
-import frc.robot.commands.intake.SetIntakePivotCommand;
-import frc.robot.commands.intake.IntakeSetRPMCommand;
+// import frc.robot.commands.intake.SetIntakePivotCommand;
+// import frc.robot.commands.intake.IntakeSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -128,12 +128,12 @@ public class RobotContainer {
       swerveSubsystem
     );
 
-    mechController.square().onTrue(
-      new SetIntakePivotCommand(pivotIntake, IntakeConstants.STOWED_POS)
-    );
-    mechController.cross().onTrue(
-      new SetIntakePivotCommand(pivotIntake, IntakeConstants.EXTENDED_POS)
-    );
+    // mechController.square().onTrue(
+    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.STOWED_POS)
+    // );
+    // mechController.cross().onTrue(
+    //   new SetIntakePivotCommand(pivotIntake, IntakeConstants.EXTENDED_POS)
+    // );
 
   // circle for the manual hopper
     mechController.circle().whileTrue(
@@ -148,14 +148,14 @@ public class RobotContainer {
       )
     );
 
-    mechController.triangle().whileTrue(
-      new IntakeSetRPMCommand(intakeSubsystem)
-    ).onFalse(
-      new InstantCommand(
-        () -> intakeSubsystem.stop(),
-        intakeSubsystem
-      )
-    );
+    // mechController.triangle().whileTrue(
+    //   new IntakeSetRPMCommand(intakeSubsystem)
+    // ).onFalse(
+    //   new InstantCommand(
+    //     () -> intakeSubsystem.stop(),
+    //     intakeSubsystem
+    //   )
+    // );
 
     /* Intake Controls - Hold button to run rollers */
     // R1 - intake in

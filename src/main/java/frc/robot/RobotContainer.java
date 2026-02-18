@@ -52,6 +52,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -77,13 +79,13 @@ public class RobotContainer {
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem(mechCAN);
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem(mechCAN);
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem(mechCAN);
+  private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
+    VisionConstants.cameraConfig11
+  );
 
-  // private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
-  //   VisionConstants.cameraConfigs[0]
-  // );
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
+    visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
 
     constructController();
     configureBindings();
@@ -109,6 +111,14 @@ public class RobotContainer {
    */
   private boolean mechEnabled = false;
   private void configureBindings() {
+    visionSubsystem1.setDefaultCommand(
+      new GetCameraDisplacement(visionSubsystem1,
+        new Transform3d(
+          Units.inchesToMeters(0),
+          Units.inchesToMeters(-43+15),
+          Units.inchesToMeters(44.25),
+          new Rotation3d(0,0,Math.PI/2))));
+
     /*
      * Driving -- One joystick controls translation, the other rotation. If the
      * robot-relative button is held down,

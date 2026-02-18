@@ -47,6 +47,13 @@ public class Robot extends LoggedRobot {
           AlertType.kWarning);
   private final double lowVoltageCutoff = 11.0;
   private final double lowVoltageTime = 2.0;
+  public enum MODE {
+    REAL,
+    SIM,
+    REPLAY
+  }
+
+  private static final MODE currentMODE = RobotBase.isReal() ? MODE.REAL : MODE.SIM;
 
   /**
    * This function is run when the robot is first started up and should be used

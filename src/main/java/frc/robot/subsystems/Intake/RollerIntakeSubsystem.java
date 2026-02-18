@@ -3,8 +3,10 @@ package frc.robot.subsystems.Intake;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import static edu.wpi.first.units.Units.Amps;
@@ -19,6 +21,7 @@ import frc.robot.Constants.IntakeConstants;
 public class RollerIntakeSubsystem extends SubsystemBase {
     private TalonFX rollerMotor;
     private final DutyCycleOut dutyCycleRequest = new DutyCycleOut(0);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
     private TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
@@ -54,6 +57,15 @@ public class RollerIntakeSubsystem extends SubsystemBase {
                 .withDutyCycleOpenLoopRampPeriod(IntakeConstants.ROLLER_OPEN_LOOP_RAMP)
         );
 
+        // PID config for velocity control! 
+        config.withSlot0(new Slot0Configs()
+                .withKP(IntakeConstants.ROLLER_KP)
+                .withKI(IntakeConstants.ROLLER_KI)
+                .withKD(IntakeConstants.ROLLER_KD)
+                .withKS(IntakeConstants.ROLLER_KS)
+                .withKV(IntakeConstants.ROLLER_KV)
+        );
+
         rollerMotor.getConfigurator().apply(config);
     }
     
@@ -63,6 +75,7 @@ public class RollerIntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake/Roller/DutyCycle", rollerMotor.get());
         SmartDashboard.putNumber("Intake/Roller/Position", rollerMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake/Roller/Velocity", rollerMotor.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Intake/Roller/VelocitySetpoint", velocityRequest.Velocity);
         SmartDashboard.putNumber("Intake/Roller/StatorCurrent", rollerMotor.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Intake/Roller/SupplyCurrent", rollerMotor.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Intake/Roller/AppliedVolts", rollerMotor.getMotorVoltage().getValueAsDouble());
@@ -70,6 +83,14 @@ public class RollerIntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake/Roller/Temp", rollerMotor.getDeviceTemp().getValueAsDouble());
         SmartDashboard.putBoolean("Intake/Roller/Connected", rollerMotor.isConnected());
         SmartDashboard.putBoolean("Intake/Roller/IsRunning", Math.abs(rollerMotor.get()) > 0.01);
+    }
+
+    /**
+     * Run intake rollers at specified velocity (rotations per second)
+     * @param velocityRPS velocity in rotations per second
+     */
+    public void setVelocity(double velocityRPS) {
+        rollerMotor.setControl(velocityRequest.withVelocity(velocityRPS));
     }
 
     /**
@@ -84,7 +105,7 @@ public class RollerIntakeSubsystem extends SubsystemBase {
      * Stop the intake rollers
      */
     public void stop() {
-        rollerMotor.setControl(dutyCycleRequest.withOutput(0));
+        rollerMotor.setControl(velocityRequest.withVelocity(0));
     }
 
     /**
@@ -92,7 +113,7 @@ public class RollerIntakeSubsystem extends SubsystemBase {
      */
     public void runIn() {
         inSpeed = SmartDashboard.getNumber("Intake/Roller/InSpeed", IntakeConstants.ROLLER_IN_SPEED);
-        setDutyCycle(inSpeed);
+        setVelocity(inSpeed);
     }
 
     /**
@@ -100,7 +121,7 @@ public class RollerIntakeSubsystem extends SubsystemBase {
      */
     public void runOut() {
         outSpeed = SmartDashboard.getNumber("Intake/Roller/OutSpeed", Math.abs(IntakeConstants.ROLLER_OUT_SPEED));
-        setDutyCycle(-outSpeed);
+        setVelocity(-outSpeed);
     }
 
     //Check if the roller is currently running

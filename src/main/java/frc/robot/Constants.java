@@ -179,12 +179,19 @@ public final class Constants {
   public static class IntakeConstants {
     // Roller Motor
     public static final int ROLLER_CAN_ID = 14;
-    public static final double ROLLER_IN_SPEED = 1;
-    public static final double ROLLER_OUT_SPEED = -1;
+    public static final double ROLLER_IN_SPEED = 60.0; // rotations per second
+    public static final double ROLLER_OUT_SPEED = -60.0; // rotations per second
     public static final double ROLLER_CURRENT_LIMIT = 120.0;
     public static final double ROLLER_STATOR_CURRENT_LIMIT = 120.0;
     public static final double ROLLER_OPEN_LOOP_RAMP = 0.0;
     public static final InvertedValue ROLLER_INVERTED = InvertedValue.CounterClockwise_Positive;
+
+    // Roller PID Constants (Velocity Control)
+    public static final double ROLLER_KP = 0.1;
+    public static final double ROLLER_KI = 0.0;
+    public static final double ROLLER_KD = 0.0;
+    public static final double ROLLER_KS = 0.0; // Static feedforward
+    public static final double ROLLER_KV = 0.12; // Velocity feedforward
 
     // Pivot Motor
     public static final int PIVOT_MOTOR_ID = 12;
@@ -302,7 +309,7 @@ public final class Constants {
     public static final double ARM_MAX_OUTPUT = 0.5;
     public static final double WINCH_MAX_OUTPUT = 1;
 
-    public static final Angle ARM_REVERSE_LIMIT = Rotations.of(-0.19);
+    public static final Angle ARM_REVERSE_LIMIT = Rotations.of(-0.15);
     public static final Angle ARM_FORWARD_LIMIT = Rotations.of(0);
 
     public static final Angle WINCH_REVERSE_LIMIT = Rotations.of(0);

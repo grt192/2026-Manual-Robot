@@ -53,11 +53,12 @@ public class VisionSubsystem extends SubsystemBase {
     private PolynomialRegression oStdDevModel = VisionConstants.oStdDevModel;
 
     private boolean connected;
-    private Transform3d latestTransform3d;
+    private Transform3d latestTransform3d = new Transform3d();
+    private String camID;
     public VisionSubsystem(CameraConfig cameraConfig) {
         // Initialize the camera with its name
         camera = new PhotonCamera(cameraConfig.getCameraName());
-
+        camID = cameraConfig.getCameraName();
         // Load AprilTag field layout 
         try{
             aprilTagFieldLayout = new AprilTagFieldLayout(
@@ -205,5 +206,8 @@ public class VisionSubsystem extends SubsystemBase {
     
     public Transform3d cameraToApriltag(){
         return latestTransform3d;
+    }
+    public String getCamID(){
+        return camID;
     }
 }

@@ -24,10 +24,10 @@ public class GetCameraDisplacement extends Command {
     private Transform3d cameraToApriltag;
     // private StructPublisher<Pose2d> cameraPosePublisher;
 
-    public GetCameraDisplacement(VisionSubsystem visionSubsytem, String camID, Transform3d robotToApriltag) {
+    public GetCameraDisplacement(VisionSubsystem visionSubsytem, Transform3d robotToApriltag) {
         this.visionSubsytem = visionSubsytem;
         this.robotToApriltag = robotToApriltag;
-        this.camID = camID;
+        this.camID = this.visionSubsytem.getCamID();
         addRequirements(visionSubsytem);
 
         // Publish initial PID values to NetworkTables so you can edit them in Shuffleboard/SmartDashboard
@@ -58,6 +58,6 @@ public class GetCameraDisplacement extends Command {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }    
 }

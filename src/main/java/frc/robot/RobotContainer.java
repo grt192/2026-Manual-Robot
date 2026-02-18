@@ -25,6 +25,7 @@ import frc.robot.subsystems.hopper.HopperSubsystem;
 
 // Commands
 import frc.robot.commands.intake.ManualIntakePivotCommand;
+import frc.robot.commands.vision.GetCameraDisplacement;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -32,6 +33,8 @@ import com.ctre.phoenix6.CANBus;
 // import frc.robot.commands.hopper.HopperSetRPMCommand;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
@@ -73,6 +76,7 @@ public class RobotContainer {
   private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
     VisionConstants.cameraConfig11
   );
+
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
@@ -100,6 +104,9 @@ public class RobotContainer {
       * the robot is controlled along its own axes, otherwise controls apply to the field axes by default. If the
       * swerve aim button is held down, the robot will rotate automatically to always face a target, and only
       * translation will be manually controllable. */
+    visionSubsystem1.setDefaultCommand(
+      new GetCameraDisplacement(visionSubsystem1, new Transform3d(0,0,0,new Rotation3d(0,0,0))));
+    
     swerveSubsystem.setDefaultCommand(
       new RunCommand(() -> {
         swerveSubsystem.setDrivePowers(

@@ -42,8 +42,8 @@ public final class VisionConstants {
       new CameraConfig(
         "11",
         new Transform3d(
-          0.28, 0, 0,
-          new Rotation3d(0, -Math.toRadians(5), 0)
+          0, 0, 0,
+          new Rotation3d(0, 0, 0)
         )
       );
     public static final CameraConfig cameraConfig6 =

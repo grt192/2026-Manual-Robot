@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javax.xml.crypto.dsig.Transform;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -14,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -50,6 +53,7 @@ public class VisionSubsystem extends SubsystemBase {
     private PolynomialRegression oStdDevModel = VisionConstants.oStdDevModel;
 
     private boolean connected;
+    private Transform3d latestTransform3d;
     public VisionSubsystem(CameraConfig cameraConfig) {
         // Initialize the camera with its name
         camera = new PhotonCamera(cameraConfig.getCameraName());
@@ -99,6 +103,7 @@ public class VisionSubsystem extends SubsystemBase {
 
                 Translation3d translation = 
                     target.getBestCameraToTarget().getTranslation();
+                latestTransform3d = target.getBestCameraToTarget();
 
                 double distance = Math.sqrt(
                     Math.pow(translation.getX(),2) +
@@ -193,7 +198,12 @@ public class VisionSubsystem extends SubsystemBase {
             Pose2d.struct
         );
     }
-    public void snapShot(){
+    public void snapShot(){//download image from 
         camera.takeOutputSnapshot();
+    }
+
+    
+    public Transform3d cameraToApriltag(){
+        return latestTransform3d;
     }
 }

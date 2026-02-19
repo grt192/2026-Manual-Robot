@@ -1,5 +1,6 @@
 package frc.robot.commands.vision;
 
+import java.io.Serial;
 import java.util.function.BooleanSupplier;
 
 import javax.xml.crypto.dsig.Transform;
@@ -29,13 +30,13 @@ public class GetCameraDisplacement extends Command {
         this.robotToApriltag = robotToApriltag;
         this.camID = this.visionSubsytem.getCamID();
         addRequirements(visionSubsytem);
-
         // Publish initial PID values to NetworkTables so you can edit them in Shuffleboard/SmartDashboard
         // SmartDashboard.putNumber("RotateToAngle/kP", RotateToAngleConstants.kP);
     }
 
     @Override
     public void initialize() {
+
         // cameraPosePublisher = swerveTable.getStructTopic(
         //     "estimatedPose",
         //     Pose2d.struct
@@ -45,14 +46,14 @@ public class GetCameraDisplacement extends Command {
 
     @Override
     public void execute() {
+
         cameraToApriltag = visionSubsytem.cameraToApriltag();
         robotToCamera = robotToApriltag.plus(cameraToApriltag.inverse());//this is what we want
-        
         // Pose3d cameraPos = new Pose3d().plus(robotToCamera);
-        SmartDashboard.putNumber(camID + "/robotToCamera", robotToCamera.getX());
-        SmartDashboard.putNumber(camID + "/robotToCamera", robotToCamera.getY());
-        SmartDashboard.putNumber(camID + "/robotToCamera", robotToCamera.getZ());
-        SmartDashboard.putString(camID + "/robotToCamera", robotToCamera.getRotation().getQuaternion().toString());
+        SmartDashboard.putNumber(camID + "/x", robotToCamera.getX());
+        SmartDashboard.putNumber(camID + "/y", robotToCamera.getY());
+        SmartDashboard.putNumber(camID + "/z", robotToCamera.getZ());
+        SmartDashboard.putString(camID + "/quat", robotToCamera.getRotation().getQuaternion().toString());
 
     }
 
@@ -60,4 +61,9 @@ public class GetCameraDisplacement extends Command {
     public boolean isFinished() {
         return false;
     }    
+    @Override
+    public boolean runsWhenDisabled() {
+        return true;
+    }
+
 }

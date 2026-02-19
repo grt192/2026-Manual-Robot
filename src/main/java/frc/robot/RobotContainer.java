@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -85,12 +86,11 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
 
     constructController();
     configureBindings();
     configureAutoChooser();
-
+    visionStuff();
     CameraServer.startAutomaticCapture(); // start driver cam
     SmartDashboard.putData("Field", m_field);
   }
@@ -111,13 +111,6 @@ public class RobotContainer {
    */
   private boolean mechEnabled = false;
   private void configureBindings() {
-    visionSubsystem1.setDefaultCommand(
-      new GetCameraDisplacement(visionSubsystem1,
-        new Transform3d(
-          Units.inchesToMeters(0),
-          Units.inchesToMeters(-43+15),
-          Units.inchesToMeters(44.25),
-          new Rotation3d(0,0,Math.PI/2))));
 
     /*
      * Driving -- One joystick controls translation, the other rotation. If the
@@ -278,6 +271,18 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+  public void visionStuff(){
+    visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
+
+    CommandScheduler.getInstance().schedule(
+    new GetCameraDisplacement(visionSubsystem1,
+        new Transform3d(
+          Units.inchesToMeters(0),
+          Units.inchesToMeters(-43-15),
+          Units.inchesToMeters(44.25),
+          new Rotation3d(0,0,Math.PI/2))));
+
   }
 
 }

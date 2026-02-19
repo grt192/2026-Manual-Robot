@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Vision;
 
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.util.PolynomialRegression;
@@ -42,8 +43,8 @@ public final class VisionConstants {
       new CameraConfig(
         "11",
         new Transform3d(
-          0, 0, 0,
-          new Rotation3d(0, 0, 0)
+          -0.25, -0.313,0.339,
+          new Rotation3d(new Quaternion(-0.6919944799721134, 0.1678468872622234, 0.15463356158232774, 0.6848792037701769))
         )
       );
     public static final CameraConfig cameraConfig6 =

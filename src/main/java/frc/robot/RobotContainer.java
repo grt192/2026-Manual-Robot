@@ -17,6 +17,8 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 // import frc.robot.subsystems.Vision.VisionSubsystem;
 // import frc.robot.subsystems.Vision.CameraConfig;
 import frc.robot.subsystems.Intake.RollerIntakeSubsystem;
+import frc.robot.subsystems.Vision.FuelDetectionSubsystem;
+import frc.robot.subsystems.Vision.VisionSubsystem;
 //import frc.robot.subsystems.Intake.PivotIntakeSubsystem;
 import frc.robot.subsystems.hopper.HopperSubsystem;
 // import frc.robot.Constants.IntakeConstants;
@@ -71,10 +73,14 @@ public class RobotContainer {
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem(mechCAN);
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem(mechCAN);
 
-  // private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
-  //   VisionConstants.cameraConfigs[0]
-  // );
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  private final VisionSubsystem visionSubsystem1 = new VisionSubsystem(
+      VisionConstants.cameraConfigs[0]);
+  private final FuelDetectionSubsystem fuelDetectionSubsystem = new FuelDetectionSubsystem(
+      VisionConstants.fuelDetectionConfig);
+
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     // visionSubsystem1.setInterface(swerveSubsystem::addVisionMeasurements);
 

@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.List;
@@ -17,10 +20,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import frc.robot.subsystems.Vision.CameraConfig;
+import frc.robot.subsystems.Vision.FuelDetectionSubsystem;
+import frc.robot.subsystems.Vision.FuelDetectionSubsystem.FuelDetectionConfig;
 import frc.robot.util.PolynomialRegression;
 
 
@@ -243,16 +250,25 @@ public final class Constants {
       0.002, 0.004, 0.005, 0.011, 0.031, 0.4, 1.72, 1.89, 2.05, 2.443, 2.804
     };
 
-    public static final CameraConfig[] cameraConfigs = new CameraConfig[]{//back top
+    public static final CameraConfig[] cameraConfigs = new CameraConfig[] { // back top
       new CameraConfig(
-        "7",
+            "192_cam6",
         new Transform3d(
-          0.28, 0, 0,
-          new Rotation3d(0, -Math.toRadians(5), 0)
-        ),
-        PoseStrategy.LOWEST_AMBIGUITY
-      )
+                0.0508, 0, 0.6858,
+                new Rotation3d(0, -.2222 * Math.PI, 0)),
+            PoseStrategy.LOWEST_AMBIGUITY)
     };
+    public static final Distance FUEL_TARGET_HEIGHT = Inches.of(3);
+    public static final int FUEL_PIPELINE_INDEX = 0;
+    public static final FuelDetectionConfig fuelDetectionConfig = new FuelDetectionSubsystem.FuelDetectionConfig(
+        cameraConfigs[0].getCameraName(),
+        Meters.of(cameraConfigs[0].getCameraPose().getZ()),
+        FUEL_TARGET_HEIGHT,
+        Radians.of(cameraConfigs[0].getCameraPose().getRotation().getY()),
+        FUEL_PIPELINE_INDEX);
+    public static final int FUEL_SMOOTHING_WINDOW_SIZE = 5;
+    public static final Time FUEL_DECAY_HOLD_TIME_SECONDS = Seconds.of(0.2);
+    public static final Time FUEL_DECAY_TIME_SECONDS = Seconds.of(0.4);
     public static final PolynomialRegression xStdDevModel = new PolynomialRegression(
       VisionConstants.STD_DEV_DIST,VisionConstants.X_STD_DEV,2);
     public static final PolynomialRegression yStdDevModel = new PolynomialRegression(

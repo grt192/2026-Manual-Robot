@@ -10,7 +10,6 @@ import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.units.CurrentUnit;
 import edu.wpi.first.units.TorqueUnit;
 import edu.wpi.first.units.Units;
@@ -22,7 +21,6 @@ import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 public class LoggedTalonFX extends TalonFX {
@@ -38,15 +36,10 @@ public class LoggedTalonFX extends TalonFX {
     }
 
     private static final TelemetryLevel DEFAULT_TELEMETRY_LEVEL = TelemetryLevel.BASIC;
-    private static final double DEFAULT_UPDATE_HZ = 10.0;
-
     private final String logPrefix;
 
     public TelemetryLevel dashboardTelemetryLevel = DEFAULT_TELEMETRY_LEVEL;
     public TelemetryLevel logTelemetryLevel = DEFAULT_TELEMETRY_LEVEL;
-
-    public double updatesPerSec = DEFAULT_UPDATE_HZ;
-    private double lastUpdateTime = 0;
 
     // ===== Cached signals (refresh once, then read many) =====
     private final StatusSignal<Angle> position = getPosition();
